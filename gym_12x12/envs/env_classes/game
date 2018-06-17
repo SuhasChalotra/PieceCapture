@@ -1,0 +1,5 @@
+class Game:
+    # This starts a new game / session. It should be initialized w/ a Gameboard and two player
+    # objects
+    def __init__(self, arg_GameBoard):
+        self.GameBoard = arg_GameBoard

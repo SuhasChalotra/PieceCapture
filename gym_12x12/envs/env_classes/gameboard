@@ -14,4 +14,5 @@ class GameBoard(gym.Env):
 
     def print_grid(self):
         print(self.Grid)
+        return
 
