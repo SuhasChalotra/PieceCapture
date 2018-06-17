@@ -1,8 +1,7 @@
 import gym
 import numpy as np
 
-
-class GameBoard(gym.Env):
+class GameBoard:
     # Constants that define the state of each GameBoard element
     EMPTY = 0
     RED = 1
@@ -11,6 +10,7 @@ class GameBoard(gym.Env):
     def __init__(self):
         # GameBoard consists of a matrix of 12x12 elements
         self.Grid = np.zeros([12, 12], dtype=int)
+        return
 
     def print_grid(self):
         print(self.Grid)
