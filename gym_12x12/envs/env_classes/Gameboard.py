@@ -1,7 +1,7 @@
-import gym
 import numpy as np
+import gym
 
-class GameBoard:
+class GameBoard(gym.Env):
     # Constants that define the state of each GameBoard element
     EMPTY = 0
     RED = 1

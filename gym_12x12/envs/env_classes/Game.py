@@ -1,10 +1,11 @@
 from gym_12x12.envs.env_classes import player
-import gym_12x12.envs.env_classes.gameboard
+from gym_12x12.envs.env_classes import Gameboard
 
 class Game:
     # This starts a new game / session. It should be initialized w/ a Gameboard and two player
     # objects
-    def __init__(self, arg_GameBoard: gameboard, arg_Player1: player, arg_Player2: player):
+    def __init__(self, arg_GameBoard: Gameboard, arg_Player1: player, arg_Player2: player):
+        # Must ensure that the correct object type is passed as parameters
         self._GameBoard = arg_GameBoard
         self.Player1 = arg_Player1
         self.Player2 = arg_Player2
