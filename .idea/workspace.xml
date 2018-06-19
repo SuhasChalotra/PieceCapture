@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e1d05044-be25-4560-b01f-aebba4829cd5" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym_12x12/envs/env_classes/game" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym_12x12/envs/env_classes/gameboard" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/gym_12x12/envs/env_classes/Game.py" beforeDir="false" afterPath="$PROJECT_DIR$/gym_12x12/envs/env_classes/Game.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -50,11 +48,20 @@
       <file leaf-file-name="Game.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/gym_12x12/envs/env_classes/Game.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="7" column="74" selection-start-line="7" selection-start-column="74" selection-end-line="7" selection-end-column="74" />
+            <state relative-caret-position="330">
+              <caret line="22" column="34" selection-start-line="22" selection-start-column="34" selection-end-line="22" selection-end-column="34" />
               <folding>
                 <element signature="e#0#45#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="exceptions.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/gym_12x12/envs/env_classes/exceptions.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="60">
+              <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
             </state>
           </provider>
         </entry>
@@ -91,6 +98,7 @@
         <option value="$PROJECT_DIR$/gym_12x12/envs/env_classes/gameboard" />
         <option value="$PROJECT_DIR$/gym_12x12/envs/env_classes/Gameboard.py" />
         <option value="$PROJECT_DIR$/gym_12x12/envs/env_classes/game" />
+        <option value="$PROJECT_DIR$/gym_12x12/envs/env_classes/exceptions.py" />
         <option value="$PROJECT_DIR$/gym_12x12/envs/env_classes/Game.py" />
       </list>
     </option>
@@ -154,7 +162,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.Gameboard">
+  <component name="RunManager" selected="Python.exceptions">
     <configuration name="Game" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="gym-12x12" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -186,6 +194,24 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/gym_12x12/envs/env_classes/Gameboard.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <configuration name="exceptions" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="gym-12x12" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/gym_12x12/envs/env_classes" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/gym_12x12/envs/env_classes/exceptions.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -227,38 +253,20 @@
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
     </configuration>
-    <configuration name="player" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="gym-12x12" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/gym_12x12/envs/env_classes" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/gym_12x12/envs/env_classes/player.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-    </configuration>
     <list>
       <item itemvalue="Python.gameboard" />
       <item itemvalue="Python.game" />
-      <item itemvalue="Python.player" />
       <item itemvalue="Python.Game" />
       <item itemvalue="Python.Gameboard" />
+      <item itemvalue="Python.exceptions" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.exceptions" />
         <item itemvalue="Python.Gameboard" />
         <item itemvalue="Python.Game" />
         <item itemvalue="Python.game" />
         <item itemvalue="Python.gameboard" />
-        <item itemvalue="Python.player" />
       </list>
     </recent_temporary>
   </component>
@@ -425,10 +433,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/gym_12x12/envs/env_classes/exceptions.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/gym_12x12/envs/env_classes/Game.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" column="74" selection-start-line="7" selection-start-column="74" selection-end-line="7" selection-end-column="74" />
+        <state relative-caret-position="330">
+          <caret line="22" column="34" selection-start-line="22" selection-start-column="34" selection-end-line="22" selection-end-column="34" />
           <folding>
             <element signature="e#0#45#0" expanded="true" />
           </folding>
