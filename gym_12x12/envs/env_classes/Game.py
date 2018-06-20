@@ -15,12 +15,12 @@ class Game:
         if isinstance(arg_player1, Player):
             self.Player1 = arg_player1
         else:
-            raise ValueError("Type must be of type Player")
+            raise ValueError("Player 1: Type must be of type Player")
 
         if isinstance(arg_player2, Player):
             self.Player2 = arg_player2
         else:
-            raise ValueError("Type must be of type Gameboard")
+            raise ValueError("Player 2: Type must be of type Player")
 
         return
 
