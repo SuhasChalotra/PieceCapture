@@ -1,5 +1,7 @@
 import numpy as np
 import gym
+from enum import Enum
+
 
 class GameBoard(gym.Env):
 
@@ -11,4 +13,11 @@ class GameBoard(gym.Env):
     def print_grid(self):
         print(self.Grid)
         return
+
+
+class PieceColor (Enum):
+    # Constants that define the state of each GameBoard element
+    EMPTY = 0
+    RED = 1
+    BLUE = 2
 

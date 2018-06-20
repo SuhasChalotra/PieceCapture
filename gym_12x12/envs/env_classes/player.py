@@ -1,11 +1,11 @@
-from abc import ABCMeta, abstractmethod
-from gym_12x12.envs.env_classes.PieceColor import PieceColor
+from abc import ABC, ABCMeta, abstractmethod
+from gym_12x12.envs.env_classes.Gameboard import GameBoard, PieceColor
 
 # Games need players. But we should only be able to instantiate a HumanPlayer or an AIPlayer
-# As Player is an abstract class
+# The Class 'Player' is abstract
 
 
-class Player (object):
+class Player (ABC):
     __metaclass__ = ABCMeta
 
     # Private instance variable
