@@ -10,18 +10,19 @@ class Game:
         if isinstance(arg_game_board, GameBoard):
             self._GameBoard = arg_game_board
         else:
-            raise ValueError("Type must be of type Gameboard")
+            raise ValueError("Gmaeboard: type must be of type gameboard")
 
         if isinstance(arg_player1, Player):
             self.Player1 = arg_player1
         else:
-            raise ValueError("Player 1: Type must be of type Player")
+            raise ValueError("Player 1: type must be of type Player")
 
         if isinstance(arg_player2, Player):
             self.Player2 = arg_player2
         else:
-            raise ValueError("Player 2: Type must be of type Player")
+            raise ValueError("Player 2: type must be of type Player")
 
+        self.assign_player_piece_color()  # ensure piece colors are different for each player
         return
 
     def assign_player_piece_color(self):
@@ -29,8 +30,17 @@ class Game:
         # the piece color assignment should it be invalid
         # We need to check if the Player1 and Player2 fields of the game are null.
         if self.Player1.piece_color == PieceColor.BLUE and self.Player2.piece_color == PieceColor.BLUE:
-            # Players have the same color
-            print('Player colors were the same, changed')
+            # Players have the same color, so change them
+            self.Player1.piece_color = PieceColor.BLUE
+            self.Player2.piece_color = PieceColor.RED
+            print('Player colors were the same, so we changed them')
+        elif self.Player1.piece_color == PieceColor.RED and self.Player2.piece_color == PieceColor.RED:
+            # Both players have the same piece color (red), so ensure they are different
+            self.Player1.piece_color = PieceColor.BLUE
+            self.Player2.piece_color = PieceColor.RED
+            print('Player colors were the same, so we changed them')
+        else:
+            print('Piece colors are fine')
 
         return
 
