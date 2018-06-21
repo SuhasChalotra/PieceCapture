@@ -5,6 +5,9 @@ from gym_12x12.envs.env_classes.Gameboard import GameBoard, PieceColor
 class Game:
     # This starts a new game / session. It should be initialized w/ a Gameboard and two player
     # objects
+
+    GAME_MOVE_INVALID = "invalid"
+
     def __init__(self, arg_game_board: GameBoard, arg_player1: Player, arg_player2: Player):
         # Must ensure that the correct object type is passed as parameters
         if isinstance(arg_game_board, GameBoard):
@@ -22,13 +25,13 @@ class Game:
         else:
             raise ValueError("Player 2: type must be of type Player")
 
-        self.assign_player_piece_color()  # ensure piece colors are different for each player
+        self.__assign_player_piece_color()  # ensure piece colors are different for each player
         return
 
-    def assign_player_piece_color(self):
-        # This method will ensure that the players have unique piece colors and should correct
-        # the piece color assignment should it be invalid
-        # We need to check if the Player1 and Player2 fields of the game are null.
+    def __assign_player_piece_color(self):
+        # This private method will ensure that the players have unique piece colors and should correct
+        # the piece color assignment should it be invalid.
+        # We need to check if the Player1 and Player2 fields of the game are null or of the incorrect type
         if self.Player1.piece_color == PieceColor.BLUE and self.Player2.piece_color == PieceColor.BLUE:
             # Players have the same color, so change them
             self.Player1.piece_color = PieceColor.BLUE
@@ -39,12 +42,26 @@ class Game:
             self.Player1.piece_color = PieceColor.BLUE
             self.Player2.piece_color = PieceColor.RED
             print('Player colors were the same, so we changed them')
-        else:
-            print('Piece colors are fine')
+        elif self.Player1.piece_color == PieceColor.EMPTY or self.Player2.piece_color == PieceColor.EMPTY:
+            # A player's piece color has been assigned as empty, which is not allowed
+            self.Player1.piece_color = PieceColor.BLUE
+            self.Player2.piece_color = PieceColor.RED
 
         return
 
     def place_piece(self, arg_player: Player, xloc, yloc):
-        # This will place a player's piece in the matrix
+        # This will place a player's piece in the game_board matrix
         # We need to make sure it can only place a piece in an empty slot
+
+        piece_to_play = arg_player.piece_color
+
+        if self._GameBoard.Grid[xloc, yloc] == PieceColor.EMPTY:  # Empty slot to play
+            self._GameBoard.Grid[xloc, yloc] = piece_to_play
+        else:
+            """ Nothing should really happen, and the attempting user should be allowed to play another move
+            We'll return a value to indicate to the calling function
+            that the game move is invalid an that the player should try again
+            """
+            return Game.GAME_MOVE_INVALID
+
         pass
