@@ -46,7 +46,7 @@ class Game:
             # A player's piece color has been assigned as empty, which is not allowed
             self.Player1.piece_color = PieceColor.BLUE
             self.Player2.piece_color = PieceColor.RED
-
+            print('One of the piece colors were assigned as empty; corrected.')
         return
 
     def place_piece(self, arg_player: Player, xloc, yloc):
@@ -58,9 +58,11 @@ class Game:
         if self._GameBoard.Grid[xloc, yloc] == PieceColor.EMPTY:  # Empty slot to play
             self._GameBoard.Grid[xloc, yloc] = piece_to_play
         else:
-            """ Nothing should really happen, and the attempting user should be allowed to play another move
-            We'll return a value to indicate to the calling function
-            that the game move is invalid an that the player should try again
+            """ Nothing should really happen, and the attempting player should be allowed to play another move.
+            We'll return a value to indicate to the calling code
+            that the game move is invalid, and that the player should try again.
+            This will only ever happen with human players. The AI will never attempt to play a piece
+            in a slot that is occupied, as it will check before doing so.
             """
             return Game.GAME_MOVE_INVALID
 

@@ -30,3 +30,17 @@ class AIPlayer (Player):
         self.piece_color = arg_piece_color
 
 
+class Strategy:
+    """" Strategies are objects that contain info on possible moves the AI can make. When the game board state is 
+    scanned / evaluated by the AI, the AI will store-up some possible strategies and then determine 'possible_plays',
+    which are simply x,y of where to place the next move
+    """""
+    priority_level = 0  # holds the strategy priority level
+    center = ()  # a strategy centers around a center tile of which we get the surrounding tiles, it will be a tuple
+    possible_plays = []  # this should be a list of x,y for possible plays in this strategy
+    surrounding_tiles = []  # this should be a list of x,y co-ordinates (max 4, min 2) of tiles that surround the center
+
+    # It is a list
+
+    def __init__(self):
+        pass
