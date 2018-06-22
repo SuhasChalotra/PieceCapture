@@ -1,4 +1,4 @@
-from gym_12x12.envs.env_classes.player import Player
+from gym_12x12.envs.env_classes.player import Player, AIPlayer, HumanPlayer
 from gym_12x12.envs.env_classes.Gameboard import GameBoard, PieceColor
 
 
@@ -13,7 +13,7 @@ class Game:
         if isinstance(arg_game_board, GameBoard):
             self._GameBoard = arg_game_board
         else:
-            raise ValueError("Gmaeboard: type must be of type gameboard")
+            raise ValueError("Game board: type must be of type gameboard")
 
         if isinstance(arg_player1, Player):
             self.Player1 = arg_player1
@@ -67,3 +67,19 @@ class Game:
             return Game.GAME_MOVE_INVALID
 
         pass
+
+    def print_game_board(self):
+        # This prints the game board contents
+        print(self._GameBoard.Grid)
+
+
+# Testing initialization of objects required
+board = GameBoard()
+AI = AIPlayer(PieceColor.BLUE)
+PL = HumanPlayer(PieceColor.RED)
+
+# Create a new game
+g = Game(board, PL, AI)
+g.print_game_board()  # Test print gameboard
+
+
