@@ -1,6 +1,6 @@
 from abc import ABC, ABCMeta, abstractmethod
-from gym_12x12.envs.env_classes.Gameboard import GameBoard, PieceColor
-from enum import Enum
+from gym_12x12.envs.env_classes.Gameboard import GameBoard
+
 
 # Games need players. But we should only be able to instantiate a HumanPlayer or an AIPlayer
 # The Class 'Player' is abstract
@@ -22,12 +22,12 @@ class Player (ABC):
 
 
 class HumanPlayer (Player):
-    def __init__(self, arg_piece_color: PieceColor):
+    def __init__(self, arg_piece_color):
         self.piece_color = arg_piece_color
 
 
 class AIPlayer (Player):
-    def __init__(self, arg_piece_color: PieceColor):
+    def __init__(self, arg_piece_color):
         self.piece_color = arg_piece_color
 
 
@@ -44,9 +44,3 @@ class Strategy:
     def __init__(self):
         pass
 
-
-class PriorityLevel(Enum):
-    # Enum that keeps track of the priority level of the strategy
-    PRIORITY_LEVEL_2 = 2
-    PRIORITY_LEVEL_3 = 3
-    PRIORITY_LEVEL_4 = 4

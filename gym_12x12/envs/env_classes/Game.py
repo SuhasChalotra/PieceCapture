@@ -1,5 +1,9 @@
 from gym_12x12.envs.env_classes.player import Player, AIPlayer, HumanPlayer
-from gym_12x12.envs.env_classes.Gameboard import GameBoard, PieceColor
+from gym_12x12.envs.env_classes.Gameboard import GameBoard
+
+EMPTY = 0
+RED = 1
+BLUE = 2
 
 
 class Game:
@@ -32,20 +36,20 @@ class Game:
         # This private method will ensure that the players have unique piece colors and should correct
         # the piece color assignment should it be invalid.
         # We need to check if the Player1 and Player2 fields of the game are null or of the incorrect type
-        if self.Player1.piece_color == PieceColor.BLUE and self.Player2.piece_color == PieceColor.BLUE:
+        if self.Player1.piece_color == BLUE and self.Player2.piece_color == BLUE:
             # Players have the same color, so change them
-            self.Player1.piece_color = PieceColor.BLUE
-            self.Player2.piece_color = PieceColor.RED
+            self.Player1.piece_color = BLUE
+            self.Player2.piece_color = RED
             print('Player colors were the same, so we changed them')
-        elif self.Player1.piece_color == PieceColor.RED and self.Player2.piece_color == PieceColor.RED:
+        elif self.Player1.piece_color == RED and self.Player2.piece_color == RED:
             # Both players have the same piece color (red), so ensure they are different
-            self.Player1.piece_color = PieceColor.BLUE
-            self.Player2.piece_color = PieceColor.RED
+            self.Player1.piece_color = BLUE
+            self.Player2.piece_color = RED
             print('Player colors were the same, so we changed them')
-        elif self.Player1.piece_color == PieceColor.EMPTY or self.Player2.piece_color == PieceColor.EMPTY:
+        elif self.Player1.piece_color == EMPTY or self.Player2.piece_color == EMPTY:
             # A player's piece color has been assigned as empty, which is not allowed
-            self.Player1.piece_color = PieceColor.BLUE
-            self.Player2.piece_color = PieceColor.RED
+            self.Player1.piece_color = BLUE
+            self.Player2.piece_color = RED
             print('One of the piece colors were assigned as empty; corrected.')
         return
 
@@ -54,8 +58,9 @@ class Game:
         # We need to make sure it can only place a piece in an empty slot
 
         piece_to_play = arg_player.piece_color
+        print("piece played is", piece_to_play)
 
-        if self._GameBoard.Grid[xloc, yloc] == PieceColor.EMPTY:  # Empty slot to play
+        if self._GameBoard.Grid[xloc, yloc] == EMPTY:  # Empty slot to play
             self._GameBoard.Grid[xloc, yloc] = piece_to_play
         else:
             """ Nothing should really happen, and the attempting player should be allowed to play another move.
@@ -64,6 +69,7 @@ class Game:
             This will only ever happen with human players. The AI will never attempt to play a piece
             in a slot that is occupied, as it will check before doing so.
             """
+            print("Did not work")
             return Game.GAME_MOVE_INVALID
 
         pass
@@ -75,8 +81,8 @@ class Game:
 
 # Testing initialization of objects required
 board = GameBoard()  # create a gameboard
-AI = AIPlayer(PieceColor.BLUE)  # create an AI Player
-PL = HumanPlayer(PieceColor.RED) # create a human player
+AI = AIPlayer(BLUE)  # create an AI Player
+PL = HumanPlayer(RED)  # create a human player
 
 # Create a new game
 g = Game(board, PL, AI)
@@ -85,6 +91,6 @@ g.print_game_board()  # Test print gameboard
 # Testing input - something like this could be in a loop with an AI player
 while True:
     x, y = input("Move (x,y): ").split(',')
-    print(x, y)
-
+    g.place_piece(PL, int(x), int(y))
+    g.print_game_board()
 
