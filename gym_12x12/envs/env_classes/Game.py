@@ -74,12 +74,17 @@ class Game:
 
 
 # Testing initialization of objects required
-board = GameBoard()
-AI = AIPlayer(PieceColor.BLUE)
-PL = HumanPlayer(PieceColor.RED)
+board = GameBoard()  # create a gameboard
+AI = AIPlayer(PieceColor.BLUE)  # create an AI Player
+PL = HumanPlayer(PieceColor.RED) # create a human player
 
 # Create a new game
 g = Game(board, PL, AI)
 g.print_game_board()  # Test print gameboard
+
+# Testing input - something like this could be in a loop with an AI player
+while True:
+    x, y = input("Move (x,y): ").split(',')
+    print(x, y)
 
 
