@@ -3,8 +3,8 @@ import numpy as np
 
 class GameBoard:
     # We need constants that describe the corners of the game board, regardless of its size
-    SPOT_TOP_LEFT = 0  # This is always going to be zero
-
+    # This is always going to be zero
+    SPOT_TOP_LEFT = 0
     SPOT_TOP_RIGHT = 0
     SPOT_BOTTOM_LEFT = 0
     SPOT_BOTTOM_RIGHT = 0
@@ -38,6 +38,7 @@ class GameBoard:
         self.Grid = np.zeros([size_x, size_y], dtype=int)
         self.XSize = size_x
         self.YSize = size_y
+
 
         # Give values to the game board constants
         GameBoard.SPOT_TOP_RIGHT = size_x - 1

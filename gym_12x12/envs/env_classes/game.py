@@ -1,5 +1,5 @@
 from gym_12x12.envs.env_classes.player import Player, AIPlayer, HumanPlayer
-from gym_12x12.envs.env_classes.Gameboard import GameBoard
+from gym_12x12.envs.env_classes.gameboard import GameBoard as gb
 
 
 class Game:
@@ -27,7 +27,7 @@ class Game:
 
         self.__assign_player_piece_color()  # ensure piece colors are different for each player
         #  Create a new game board
-        self._GameBoard = GameBoard(size_x=arg_size_x, size_y=arg_size_y)
+        self.Board = gb(size_x=arg_size_x, size_y=arg_size_y)
 
         # These fields keep track of players' scores
         self.P1Score = 0
@@ -67,16 +67,16 @@ class Game:
             raise ValueError("y location must be an integer")
             return Game.GAME_MOVE_INVALID
 
-        if xloc < 0 or xloc > self._GameBoard.XSize:
+        if xloc < 0 or xloc > self.Board.XSize:
             print("x is out of range. x=", xloc)
             return Game.GAME_MOVE_INVALID
 
-        if yloc < 0 or yloc > self._GameBoard.YSize:
+        if yloc < 0 or yloc > self.Board.YSize:
             print("y is out of range. y=", yloc)
             return Game.GAME_MOVE_INVALID
 
-        if self._GameBoard.Grid[xloc, yloc] == Game.EMPTY:  # Empty slot to play
-            self._GameBoard.Grid[xloc, yloc] = arg_player.piece_color
+        if self.Board.Grid[xloc, yloc] == Game.EMPTY:  # Empty slot to play
+            self.Board.Grid[xloc, yloc] = arg_player.piece_color
             return Game.GAME_MOVE_VALID
         else:
             """ Nothing should really happen, and the attempting player should be allowed to play another move.
@@ -91,7 +91,7 @@ class Game:
 
     def print_game_board(self):
         # This prints the game board contents
-        print(self._GameBoard.Grid)
+        print(self.Board.Grid)
 
     def referee_assess(self):
         """
@@ -100,18 +100,14 @@ class Game:
         """
         i = 0
         # As a test, let's iterate through the Game board
-        for row in self._GameBoard.Grid:
+        for row in self.Board.Grid:
                 print(i)
                 i += 1
                 # print(row_index, col_index)
                 # print(self._GameBoard.Grid[row_index, col_index])
 
 
-Human = HumanPlayer(Game.BLUE)
-AI = AIPlayer(Game.RED)
-game = Game(Human, AI)
+def tryThis():
+    print("Try this")
 
-# game.place_piece(AI, 0, 0)
-# game.place_piece(Human, 0, 1)
-# Test
-print(game._GameBoard)
+tryThis()

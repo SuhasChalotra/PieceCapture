@@ -1,6 +1,4 @@
 from abc import ABC, ABCMeta, abstractmethod
-from gym_12x12.envs.env_classes.Gameboard import GameBoard
-
 
 # Games need players. But we should only be able to instantiate a HumanPlayer or an AIPlayer
 # The Class 'Player' is abstract

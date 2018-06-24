@@ -1,6 +1,6 @@
 import gym
 from gym_12x12.envs.env_classes.player import Player, HumanPlayer, AIPlayer
-from gym_12x12.envs.env_classes.Game import Game
+from gym_12x12.envs.env_classes.game import Game
 
 PLAYERTYPE_HUMAN = 0
 PLAYERTYPE_AI = 1
