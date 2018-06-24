@@ -54,11 +54,11 @@ class Game:
             raise ValueError("y location must be an integer")
             return Game.GAME_MOVE_INVALID
 
-        if xloc < 0 or xloc > self.Board.XSize:
+        if xloc < 0 or xloc > self.Board.COL_COUNT:
             print("x is out of range. x=", xloc)
             return Game.GAME_MOVE_INVALID
 
-        if yloc < 0 or yloc > self.Board.YSize:
+        if yloc < 0 or yloc > self.Board.ROW_COUNT:
             print("y is out of range. y=", yloc)
             return Game.GAME_MOVE_INVALID
 
@@ -91,7 +91,7 @@ class Game:
 
         # As a test, let's iterate through entire board
         for r_rows in range(0, len(self.Board.Grid)):
-            for c_cols in range(0, self.Board.XSize):
+            for c_cols in range(0, self.Board.COL_COUNT):
                 if self.Board.Grid[r_rows, c_cols] == Game.EMPTY:
                     continue  # go to next iteration
                 if self.Board.Grid[r_rows, c_cols] == Game.BLUE_PIECE:
@@ -138,8 +138,32 @@ class Game:
 
         # Check the outer edges (excluding corners)
         # TOP EDGE
+        if at_row == 0 and at_col >= 1 and at_col <= self.Board.COL_COUNT - 2:
+            if self.Board.Grid[at_row, at_col - 1] == opp_color and self.Board.Grid[at_row + 1, at_col] and \
+                    self.Board.Grid[at_row, at_col + 1]:
+                return True
+
+        # BOTTOM edge
+        if at_row == self.Board.ROW_COUNT - 1 and at_col >= 1 and at_col <= self.Board.COL_COUNT - 2:
+            if self.Board.Grid[at_row, at_col - 1] == opp_color and self.Board.Grid[at_row - 1, at_col] and \
+                    self.Board.Grid[at_row, at_col + 1]:
+                return True
+
+        # LEFT EDGE
+        if at_col == 0 and at_row >= 1 and at_row <= self.Board.ROW_COUNT - 1:
+            if self.Board.Grid[at_row - 1, at_col] == opp_color and self.Board.Grid[at_row + 1, at_col] and \
+                    self.Board.Grid[at_row, at_col + 1]:
+                return True
+
+        # RIGHT EDGE
+        if at_col == self.Board.COL_COUNT - 1 and at_row >= 1 and at_row <= self.Board.ROW_COUNT - 2:
+            if self.Board.Grid[at_row - 1, at_col] == opp_color and self.Board.Grid[at_row, at_col - 1] and \
+                    self.Board.Grid[at_row + 1, at_col]:
+                return True
+
         # Check for inner space
-        if self.Board.Grid[at_row, at_col - 1] == opp_color and self.Board.Grid[at_row - 1, at_col] == opp_color and self.Board.Grid[at_row, at_col + 1] == opp_color and self.Board.Grid[at_row + 1, at_col] == opp_color:
+        if self.Board.Grid[at_row, at_col - 1] == opp_color and self.Board.Grid[at_row - 1, at_col] == opp_color and \
+                self.Board.Grid[at_row, at_col + 1] == opp_color and self.Board.Grid[at_row + 1, at_col] == opp_color:
             return True
 
         #  When all else fails, return false

@@ -32,8 +32,8 @@ class GameBoard:
             print("Invalid integer size for y. Changed to y=12")
 
         self.Grid = np.zeros([size_y, size_x], dtype=int)
-        self.XSize = size_x
-        self.YSize = size_y
+        self.ROW_COUNT = size_x
+        self.COL_COUNT = size_y
 
         self.SPOT_TOP_LEFT = (0, 0)
         self.SPOT_TOP_RIGHT = (0, size_x - 1)
