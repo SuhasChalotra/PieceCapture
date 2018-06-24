@@ -20,13 +20,13 @@ class Player (ABC):
 
 
 class HumanPlayer (Player):
-    def __init__(self, arg_piece_color):
-        self.piece_color = arg_piece_color
+    def __init__(self):
+        pass
 
 
 class AIPlayer (Player):
-    def __init__(self, arg_piece_color):
-        self.piece_color = arg_piece_color
+    def __init__(self):
+        pass
 
 
 class Strategy:

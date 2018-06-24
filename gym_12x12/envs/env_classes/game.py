@@ -9,8 +9,8 @@ class Game:
     GAME_MOVE_INVALID = -1
     GAME_MOVE_VALID = 0
     EMPTY = 0
-    RED = 1
-    BLUE = 2
+    RED_PIECE = 2
+    BLUE_PIECE = 1
 
     def __init__(self, player_1, player_2, arg_size_x=12, arg_size_y=12):
         # Must ensure that the correct object type is passed as parameters
@@ -30,29 +30,16 @@ class Game:
         self.Board = gb(size_x=arg_size_x, size_y=arg_size_y)
 
         # These fields keep track of players' scores
-        self.P1Score = 0
-        self.P2Score = 0
+        self.BlueScore = 0
+        self.RedScore = 0
 
     def __assign_player_piece_color(self):
         # This private method will ensure that the players have unique piece colors and should correct
         # the piece color assignment should it be invalid.
         # We need to check if the Player1 and Player2 fields of the game are null or of the incorrect type
-        if self.Player1.piece_color == Game.BLUE and self.Player2.piece_color == Game.BLUE:
-            # Players have the same color, so change them
-            self.Player1.piece_color = Game.BLUE
-            self.Player2.piece_color = Game.RED
-            print('Player colors were the same, so we changed them')
-        elif self.Player1.piece_color == Game.RED and self.Player2.piece_color == Game.RED:
-            # Both players have the same piece color (red), so ensure they are different
-            self.Player1.piece_color = Game.BLUE
-            self.Player2.piece_color = Game.RED
-            print('Player colors were the same, so we changed them')
-        elif self.Player1.piece_color == Game.EMPTY or self.Player2.piece_color == Game.EMPTY:
-            # A player's piece color has been assigned as empty, which is not allowed
-            self.Player1.piece_color = Game.BLUE
-            self.Player2.piece_color = Game.RED
-            print('One of the piece colors were assigned as empty; corrected.')
-        return
+
+            self.Player1.piece_color = Game.BLUE_PIECE
+            self.Player2.piece_color = Game.RED_PIECE
 
     def place_piece(self, arg_player: Player, xloc, yloc):
         # This will place a player's piece in the game_board matrix
@@ -93,21 +80,85 @@ class Game:
         # This prints the game board contents
         print(self.Board.Grid)
 
-    def referee_assess(self):
+    def sweep_board(self):
         """
         This scans the game board and keeps track of the scores
+        We have to check the four corners, the edges and the inner board
         :return:
         """
-        i = 0
-        # As a test, let's iterate through the Game board
-        for row in self.Board.Grid:
-                print(i)
-                i += 1
-                # print(row_index, col_index)
-                # print(self._GameBoard.Grid[row_index, col_index])
+        int_blue_score_tally = 0
+        int_red_score_tally = 0
+
+        # As a test, let's iterate through entire board
+        for r_rows in range(0, len(self.Board.Grid)):
+            for c_cols in range(0, self.Board.XSize):
+                if self.Board.Grid[r_rows, c_cols] == Game.EMPTY:
+                    continue  # go to next iteration
+                if self.Board.Grid[r_rows, c_cols] == Game.BLUE_PIECE:
+                    if self.__is_piece_surrounded(r_rows, c_cols):
+                        print("Red scores a point")
+                        int_red_score_tally += 1
+                elif self.Board.Grid[r_rows, c_cols] == Game.RED_PIECE:
+                    if self.__is_piece_surrounded(r_rows, c_cols):
+                        print("Blue scores a point")
+                        int_blue_score_tally += 1
+
+        # calc the final score count
+        self.BlueScore = int_blue_score_tally
+        self.RedScore = int_red_score_tally
+
+    def __is_piece_surrounded(self, at_row, at_col):
+        #  This function returns true if a piece at (col, row) is surrounded by an opposing color
+        """
+        :param at_col: column
+        :param at_row: ro
+        :return: boolean
+        """
+        opp_color = self.__get_opposing_color(self.Board.Grid[at_row, at_col])
+
+        # Check the corners
+        # Top LEFT
+        if (at_row, at_col) == self.Board.SPOT_TOP_LEFT:
+            if self.Board.Grid[at_row, at_col + 1] == opp_color and self.Board.Grid[at_row + 1, at_col] == opp_color:
+                return True
+
+        # TOP RIGHT
+        if (at_row, at_col) == self.Board.SPOT_TOP_RIGHT:
+            if self.Board.Grid[at_row, at_col - 1] == opp_color and self.Board.Grid[at_row + 1, at_col] == opp_color:
+                return True
+
+        # BOTTOM LEFT
+        if (at_row, at_col) == self.Board.SPOT_BOTTOM_LEFT:
+            if self.Board.Grid[at_row - 1, at_col] == opp_color and self.Board.Grid[at_row, at_col + 1] == opp_color:
+                return True
+        # BOTTOM RIGHT
+        if (at_row, at_col) == self.Board.SPOT_BOTTOM_RIGHT:
+            if self.Board.Grid[at_row - 1, at_col] == opp_color and self.Board.Grid[at_row, at_col - 1] == opp_color:
+                return True
+
+        # Check the outer edges (excluding corners)
+        # TOP EDGE
+        # Check for inner space
+        if self.Board.Grid[at_row, at_col - 1] == opp_color and self.Board.Grid[at_row - 1, at_col] == opp_color and self.Board.Grid[at_row, at_col + 1] == opp_color and self.Board.Grid[at_row + 1, at_col] == opp_color:
+            return True
+
+        #  When all else fails, return false
+        return False
+
+    @staticmethod
+    def __get_opposing_color(incolor):
+        # if incolor is red, return blue and vice versa
+        if incolor == Game.RED_PIECE:
+            return Game.BLUE_PIECE
+        elif incolor == Game.BLUE_PIECE:
+            return Game.RED_PIECE
+        else:
+            raise ValueError("Invalid piece color / integer")
 
 
-def tryThis():
-    print("Try this")
+    def test_fill_inner_tiles(self):
+        # this is a test function
+        for r_rows in range(1, len(self.Board.Grid) - 1):
+            for c_cols in range(1, self.Board.XSize - 1):
+                self.Board.Grid[c_cols, r_rows] = Game.RED_PIECE
 
-tryThis()
