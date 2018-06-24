@@ -16,7 +16,7 @@ class gym12x12_env(gym.Env):
 
     def step(self, action):
         """
-        Placing a tile on the board and alternate the current player
+        This complies with the gym interface: Placing a tile on the board and alternate the current player
         :param action: an ActionClass object which contains the player making the move and the x, y moves
         :return:
         """

@@ -29,6 +29,10 @@ class Game:
         #  Create a new game board
         self._GameBoard = GameBoard(size_x=arg_size_x, size_y=arg_size_y)
 
+        # These fields keep track of players' scores
+        self.P1Score = 0
+        self.P2Score = 0
+
     def __assign_player_piece_color(self):
         # This private method will ensure that the players have unique piece colors and should correct
         # the piece color assignment should it be invalid.
@@ -54,7 +58,14 @@ class Game:
         # This will place a player's piece in the game_board matrix
         # We need to make sure it can only place a piece in an empty slot
 
-        # x and y need to be within range
+        # x and y need to be within range and be valid integers
+        if not isinstance(xloc, int):
+            raise ValueError("x location must be an integer")
+            return Game.GAME_MOVE_INVALID
+
+        if not isinstance(yloc, int):
+            raise ValueError("y location must be an integer")
+            return Game.GAME_MOVE_INVALID
 
         if xloc < 0 or xloc > self._GameBoard.XSize:
             print("x is out of range. x=", xloc)
@@ -64,11 +75,8 @@ class Game:
             print("y is out of range. y=", yloc)
             return Game.GAME_MOVE_INVALID
 
-        piece_to_play = arg_player.piece_color  # determine the piece color
-        print("piece played is", piece_to_play)
-
         if self._GameBoard.Grid[xloc, yloc] == Game.EMPTY:  # Empty slot to play
-            self._GameBoard.Grid[xloc, yloc] = piece_to_play
+            self._GameBoard.Grid[xloc, yloc] = arg_player.piece_color
             return Game.GAME_MOVE_VALID
         else:
             """ Nothing should really happen, and the attempting player should be allowed to play another move.
@@ -78,11 +86,29 @@ class Game:
             in a slot that is occupied, as it will check before doing so. It also should never
             play an invalid move (ex. index out of rage)
             """
+            print("Invalid move. Try again.")
             return Game.GAME_MOVE_INVALID
 
     def print_game_board(self):
         # This prints the game board contents
         print(self._GameBoard.Grid)
 
+    def referee_assess(self):
+        """
+        This scans the game board and keeps track of the scores
+        :return:
+        """
+        # As a test, let's iterate through the gameboard
+        for row in self._GameBoard.Grid:
+            for elem in row:
+                print(elem)
 
 
+Human = HumanPlayer(Game.BLUE)
+AI = AIPlayer(Game.RED)
+game = Game(Human, AI)
+
+game.place_piece(AI, 0, 0)
+game.place_piece(Human, 0, 1)
+# Test
+game.referee_assess()
