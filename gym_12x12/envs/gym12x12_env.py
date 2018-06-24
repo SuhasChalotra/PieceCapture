@@ -30,6 +30,9 @@ class gym12x12_env(gym.Env):
 
         else:
             raise ValueError("action must be of type Action Class")
+        #Add a check for rewards
+
+        #Return observations, rewards, done, info
 
     def render(self):
         self.Game.print_game_board()  # Prints the game board
