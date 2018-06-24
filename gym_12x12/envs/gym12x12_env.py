@@ -20,16 +20,14 @@ class gym12x12_env(gym.Env):
         :param action: an ActionClass object which contains the player making the move and the x, y moves
         :return:
         """
-        if isinstance(action, ActionClass):
-            output = self.Game.place_piece(action.get_player, action.get_x_move, action.get_y_move)
-            if output == Game.GAME_MOVE_VALID:
-                if self.CurrentPlayer == self.Player1:
-                    self.CurrentPlayer = self.Player2
-                else:
-                    self.CurrentPlayer = self.Player1
 
-        else:
-            raise ValueError("action must be of type Action Class")
+        output = self.Game.place_piece(self.CurrentPlayer, action[0], action[1])
+        if output == Game.GAME_MOVE_VALID:
+            if self.CurrentPlayer == self.Player1:
+                self.CurrentPlayer = self.Player2
+            else:
+                self.CurrentPlayer = self.Player1
+
         #Add a check for rewards
 
         #Return observations, rewards, done, info
@@ -70,32 +68,3 @@ class gym12x12_env(gym.Env):
             return AIPlayer(Game.RED)
 
 
-class ActionClass:
-    """
-    This class represents our play-moves, and contains the player making the move
-    and the x,y co-ordinate of the move to make
-    """
-    def __init__(self, arg_player, arg_x_move, arg_y_move):
-        if isinstance(arg_player, Player):
-            self.Player = arg_player
-        else:
-            raise ValueError
-
-        if isinstance(arg_x_move, int):
-            self.X = arg_x_move
-        else:
-            raise ValueError
-
-        if isinstance(arg_y_move, int):
-            self.Y = arg_y_move
-        else:
-            raise ValueError
-
-    def get_player(self):
-        return self.Player
-
-    def get_x_move(self):
-        return self.X
-
-    def get_y_move(self):
-        return self.Y

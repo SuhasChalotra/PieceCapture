@@ -98,17 +98,20 @@ class Game:
         This scans the game board and keeps track of the scores
         :return:
         """
-        # As a test, let's iterate through the gameboard
+        i = 0
+        # As a test, let's iterate through the Game board
         for row in self._GameBoard.Grid:
-            for elem in row:
-                print(elem)
+                print(i)
+                i += 1
+                # print(row_index, col_index)
+                # print(self._GameBoard.Grid[row_index, col_index])
 
 
 Human = HumanPlayer(Game.BLUE)
 AI = AIPlayer(Game.RED)
 game = Game(Human, AI)
 
-game.place_piece(AI, 0, 0)
-game.place_piece(Human, 0, 1)
+# game.place_piece(AI, 0, 0)
+# game.place_piece(Human, 0, 1)
 # Test
-game.referee_assess()
+print(game._GameBoard)
