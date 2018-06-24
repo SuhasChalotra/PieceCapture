@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e1d05044-be25-4560-b01f-aebba4829cd5" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym_12x12/envs/env_classes/game.py" beforeDir="false" afterPath="$PROJECT_DIR$/gym_12x12/envs/env_classes/game.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym_12x12/envs/env_classes/gameboard.py" beforeDir="false" afterPath="$PROJECT_DIR$/gym_12x12/envs/env_classes/gameboard.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gym_12x12/envs/env_classes/testfile.py" beforeDir="false" afterPath="$PROJECT_DIR$/gym_12x12/envs/env_classes/testfile.py" afterDir="false" />
-    </list>
+    <list default="true" id="e1d05044-be25-4560-b01f-aebba4829cd5" name="Default" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -72,8 +67,8 @@
       <file leaf-file-name="testfile.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/gym_12x12/envs/env_classes/testfile.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="360">
-              <caret line="24" column="21" lean-forward="true" selection-start-line="24" selection-start-column="21" selection-end-line="24" selection-end-column="21" />
+            <state relative-caret-position="420">
+              <caret line="28" lean-forward="true" selection-start-line="28" selection-end-line="28" />
               <folding>
                 <element signature="e#0#48#0" expanded="true" />
               </folding>
@@ -124,7 +119,7 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="y" value="423" />
+    <option name="y" value="469" />
     <option name="width" value="1920" />
     <option name="height" value="1057" />
   </component>
@@ -308,17 +303,16 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="423" width="1920" height="1057" extended-state="0" />
-    <editor active="true" />
+    <frame x="0" y="672" width="1920" height="1057" extended-state="0" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25572917" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25855714" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.43438452" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.44479167" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.32984293" />
       <window_info anchor="bottom" id="Python Console" order="7" weight="0.32948717" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Terminal" order="7" weight="0.32820514" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="7" visible="true" weight="0.328125" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.31410256" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -553,8 +547,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/gym_12x12/envs/env_classes/testfile.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="24" column="21" lean-forward="true" selection-start-line="24" selection-start-column="21" selection-end-line="24" selection-end-column="21" />
+        <state relative-caret-position="420">
+          <caret line="28" lean-forward="true" selection-start-line="28" selection-end-line="28" />
           <folding>
             <element signature="e#0#48#0" expanded="true" />
           </folding>
