@@ -16,8 +16,9 @@ class gym12x12_env(gym.Env):
 
     def step(self, action):
         """
-        This complies with the gym interface: Placing a tile on the board and alternate the current player
-        :param action: an ActionClass object which contains the player making the move and the x, y moves
+        This complies with the gym interface: Placing a tile on the board and alternates the current player
+        :param action: a tuple  which contains the player's row_move, col_move -ie. where they will
+         place the tile on the board(y, x)
         :return:
         """
 
@@ -35,18 +36,18 @@ class gym12x12_env(gym.Env):
     def render(self):
         self.Game.print_game_board()  # Prints the game board
 
-    def reset(self, argPlayer1, argPlayer2, size_x=12, size_y=12):
+    def reset(self, argPlayer1, argPlayer2, size_rows=12, size_cols=12):
         """
         Resets the fields. Defaults the current player to Player1
         :param argPlayer1: Player1
         :param argPlayer2: Player2
-        :param size_x: x size of game board (default = 12)
-        :param size_y: y size of game board (default = 12)
+        :param size_rows: x size of game board (default = 12)
+        :param size_cols: y size of game board (default = 12)
         :return:
         """
         self.Player1 = argPlayer1
         self.Player2 = argPlayer2
-        self.Game = Game(self.Player1, self.Player2, arg_size_x=size_x, arg_size_y=size_y)
+        self.Game = Game(self.Player1, self.Player2, size_y=size_rows, size_x=size_cols)
         self.CurrentPlayer = self.Player1
 
     def close(self):

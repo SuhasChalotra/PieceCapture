@@ -12,7 +12,7 @@ class Game:
     RED_PIECE = 2
     BLUE_PIECE = 1
 
-    def __init__(self, player_1, player_2, arg_size_x=12, arg_size_y=12):
+    def __init__(self, player_1, player_2, rows=12, cols=12):
         # Must ensure that the correct object type is passed as parameters
 
         if isinstance(player_1, Player):
@@ -27,7 +27,7 @@ class Game:
 
         self.__assign_player_piece_color()  # ensure piece colors are different for each player
         #  Create a new game board
-        self.Board = gb(size_x=arg_size_x, size_y=arg_size_y)
+        self.Board = gb(size_y=rows, size_x=cols)
 
         # These fields keep track of players' scores
         self.BlueScore = 0
@@ -41,7 +41,7 @@ class Game:
             self.Player1.piece_color = Game.BLUE_PIECE
             self.Player2.piece_color = Game.RED_PIECE
 
-    def place_piece(self, arg_player: Player, xloc, yloc):
+    def place_piece(self, arg_player: Player, yloc, xloc):
         # This will place a player's piece in the game_board matrix
         # We need to make sure it can only place a piece in an empty slot
 
@@ -62,9 +62,13 @@ class Game:
             print("y is out of range. y=", yloc)
             return Game.GAME_MOVE_INVALID
 
-        if self.Board.Grid[xloc, yloc] == Game.EMPTY:  # Empty slot to play
-            self.Board.Grid[xloc, yloc] = arg_player.piece_color
+        if self.Board.Grid[yloc, xloc] == Game.EMPTY:  # Empty slot to play
+            self.Board.Grid[yloc, xloc] = arg_player.piece_color
+
+            # Here we should do a sweep for points
+            self.sweep_board()
             return Game.GAME_MOVE_VALID
+
         else:
             """ Nothing should really happen, and the attempting player should be allowed to play another move.
             We'll return a value to indicate to the calling code
