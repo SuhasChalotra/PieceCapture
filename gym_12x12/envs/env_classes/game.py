@@ -174,19 +174,24 @@ class Game:
         return False
 
     @staticmethod
-    def __get_opposing_color(incolor):
-        # if incolor is red, return blue and vice versa
-        if incolor == Game.RED_PIECE:
+    def __get_opposing_color(in_color):
+        # if in_color is red, return blue and vice versa
+        if in_color == Game.RED_PIECE:
             return Game.BLUE_PIECE
-        elif incolor == Game.BLUE_PIECE:
+        elif in_color == Game.BLUE_PIECE:
             return Game.RED_PIECE
         else:
             raise ValueError("Invalid piece color / integer")
 
+    def is_game_complete(self):
+        """
+        Checks the game board for any empty spots. If none are available, then the game is complete and return true
+        else, return false.
+        :return: boolean: returns true if there are no empty spots left on the game board
+        """
+        for y_range in self.Board.Grid:
+            for x_range in y_range:
+                if self.Board.Grid[y_range, x_range] == Game.EMPTY:  # Encountered an empty tile. immediately return false
+                    return False
 
-    def test_fill_inner_tiles(self):
-        # this is a test function
-        for r_rows in range(1, len(self.Board.Grid) - 1):
-            for c_cols in range(1, self.Board.XSize - 1):
-                self.Board.Grid[c_cols, r_rows] = Game.RED_PIECE
-
+        return True
