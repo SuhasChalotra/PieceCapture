@@ -1,5 +1,6 @@
 from gym_12x12.envs.env_classes.player import Player, AIPlayer, HumanPlayer
 from gym_12x12.envs.env_classes.gameboard import GameBoard as gb
+import numpy as np
 
 
 class Game:
@@ -203,3 +204,25 @@ class Game:
                     return False
 
         return True
+
+    def piece_surrounded_alt(self,row, col):
+        surrounding_pieces = self.get_surrounding_pieces(row,col)
+        opp_color = self.__get_opposing_color(self.Board.Grid[row, col])
+
+        for piece in surrounding_pieces:
+            if self.Board.Grid[piece[0],piece[1]] == opp_color:
+                return True
+
+    def get_surrounding_pieces(self, row, col):
+        """
+        This function will return  a list of the 2-4 surrounding pieces
+        :param row:
+        :param col:
+        :return:
+        """
+        output = [[row-1,col],[row+1,col],[row,col+1],[row,col-1]]
+        for item in output:
+            if item[0] < 0 or item[1] < 0 or item[0] >= self.Board.ROW_COUNT or item[1] >= self.Board.COL_COUNT:
+                output.remove(item)
+
+        return output
