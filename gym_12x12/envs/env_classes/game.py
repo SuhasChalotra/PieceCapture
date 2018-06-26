@@ -3,9 +3,6 @@ from gym_12x12.envs.env_classes.gameboard import GameBoard as gb
 
 
 class Game:
-    # This starts a new game / session. It should be initialized w/ a Gameboard and two player
-    # objects
-
     GAME_MOVE_INVALID = -1
     GAME_MOVE_VALID = 0
     EMPTY = 0
@@ -13,6 +10,13 @@ class Game:
     BLUE_PIECE = 1
 
     def __init__(self, player_1, player_2, rows=12, cols=12):
+        """
+        Initializes a new game.
+        :param player_1: The blue player object
+        :param player_2: The red player object
+        :param rows: on the Y-axis [rows, cols]
+        :param cols: on the X-axis [rows, cols]
+        """
         # Must ensure that the correct object type is passed as parameters
 
         if isinstance(player_1, Player):
@@ -34,48 +38,49 @@ class Game:
         self.RedScore = 0
 
     def __assign_player_piece_color(self):
-        # This private method will ensure that the players have unique piece colors and should correct
-        # the piece color assignment should it be invalid.
-        # We need to check if the Player1 and Player2 fields of the game are null or of the incorrect type
-
-            self.Player1.piece_color = Game.BLUE_PIECE
-            self.Player2.piece_color = Game.RED_PIECE
+        """
+        This private method will ensure that the Player1 is BLUE and Player2 is RED
+        """
+        self.Player1.piece_color = Game.BLUE_PIECE
+        self.Player2.piece_color = Game.RED_PIECE
 
     def place_piece(self, arg_player: Player, yloc, xloc):
-        # This will place a player's piece in the game_board matrix
-        # We need to make sure it can only place a piece in an empty slot
-
-        # x and y need to be within range and be valid integers
-        if not isinstance(xloc, int):
-            raise ValueError("x location must be an integer")
-            return Game.GAME_MOVE_INVALID
-
+        """
+        This will place a player's piece in the game_board matrix
+        :param arg_player: the player making the move
+        :param yloc: Y-axis
+        :param xloc: X-axis
+        :return: int. Either Game move is VALID or INVALID
+        """
+        # yloc and xloc need to be within range and be valid integers
         if not isinstance(yloc, int):
-            raise ValueError("y location must be an integer")
+            print("y location must be an integer")
             return Game.GAME_MOVE_INVALID
 
-        if xloc < 0 or xloc > self.Board.COL_COUNT:
+        if not isinstance(xloc, int):
+            print("x location must be an integer")
+            return Game.GAME_MOVE_INVALID
+
+        if xloc < 0 or xloc > self.Board.COL_COUNT - 1:
             print("x is out of range. x=", xloc)
             return Game.GAME_MOVE_INVALID
 
-        if yloc < 0 or yloc > self.Board.ROW_COUNT:
+        if yloc < 0 or yloc > self.Board.ROW_COUNT - 1:
             print("y is out of range. y=", yloc)
             return Game.GAME_MOVE_INVALID
 
         if self.Board.Grid[yloc, xloc] == Game.EMPTY:  # Empty slot to play
             self.Board.Grid[yloc, xloc] = arg_player.piece_color
-
-            # Here we should do a sweep for points
             self.sweep_board()
             return Game.GAME_MOVE_VALID
 
         else:
-            """ Nothing should really happen, and the attempting player should be allowed to play another move.
+            """ The attempting player should be allowed to play another move until the move entered is valid.
             We'll return a value to indicate to the calling code
             that the game move is invalid, and that the player should try again.
-            This will only ever happen with human players. The AI will never attempt to play a piece
-            in a slot that is occupied, as it will check before doing so. It also should never
-            play an invalid move (ex. index out of rage)
+            This will only ever happen with human players. The AI can never attempt to play a piece
+            in a slot that is occupied, as it will check before doing so. It also can never
+            play an invalid move (ex. index out of range)
             """
             print("Invalid move. Try again.")
             return Game.GAME_MOVE_INVALID
@@ -86,9 +91,8 @@ class Game:
 
     def sweep_board(self):
         """
-        This scans the game board and keeps track of the scores
-        We have to check the four corners, the edges and the inner board
-        :return:
+        This scans the game board spot-by-spot and tallies the scores for blue and red.
+        :return: void.
         """
         int_blue_score_tally = 0
         int_red_score_tally = 0
@@ -112,11 +116,11 @@ class Game:
         self.RedScore = int_red_score_tally
 
     def __is_piece_surrounded(self, at_row, at_col):
-        #  This function returns true if a piece at (col, row) is surrounded by an opposing color
         """
-        :param at_col: column
-        :param at_row: ro
-        :return: boolean
+        This private function determines if a game piece located at [row, col] is surrounded by an opposing piece
+        :param at_row: on the Y axis
+        :param at_col: on the X axis
+        :return: boolean - if a piece located at [row, col] is surrounded, return True
         """
         opp_color = self.__get_opposing_color(self.Board.Grid[at_row, at_col])
 
@@ -175,7 +179,11 @@ class Game:
 
     @staticmethod
     def __get_opposing_color(in_color):
-        # if in_color is red, return blue and vice versa
+        """
+        :param in_color: the piece color of which we want to find the opposite color
+        ie. if in_color is BLUE, return RED. If in_color is RED, return BLUE
+        :return: int - either Game.BLUE_PIECE or Game.RED_PIECE
+        """
         if in_color == Game.RED_PIECE:
             return Game.BLUE_PIECE
         elif in_color == Game.BLUE_PIECE:
@@ -187,7 +195,7 @@ class Game:
         """
         Checks the game board for any empty spots. If none are available, then the game is complete and return true
         else, return false.
-        :return: boolean: returns true if there are no empty spots left on the game board
+        :return: boolean. returns True if there are no empty spots left on the game board
         """
         for y_range in self.Board.Grid:
             for x_range in y_range:

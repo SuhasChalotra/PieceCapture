@@ -5,10 +5,15 @@ from abc import ABC, ABCMeta, abstractmethod
 
 
 class Player (ABC):
+    """
+    The player class represents participants in our game. They can be human players or AI players.
+    This is an abstract class and cannot be instantiated.
+    """
     __metaclass__ = ABCMeta
 
     # Private instance variable
     _p_piece_color = None
+    _p_name = None  # holds the name or label/identifier
 
     @property
     def piece_color(self):
@@ -18,13 +23,27 @@ class Player (ABC):
     def piece_color(self, value):
         self._p_piece_color = value
 
+    @property
+    def name(self):
+        return self._p_name
+
+    @name.setter
+    def name(self, value):
+        self._p_name = value
+
 
 class HumanPlayer (Player):
+    """
+    A human player will be prompted to make its move via the keyboard input
+    """
     def __init__(self):
         pass
 
 
 class AIPlayer (Player):
+    """
+    A AI Player
+    """
     def __init__(self):
         pass
 

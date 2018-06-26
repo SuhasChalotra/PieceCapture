@@ -2,9 +2,10 @@ import numpy as np
 
 
 class GameBoard:
-    # We need constants that describe the corners of the game board, regardless of its size
-    # This is always going to be zero
-
+    """
+    The Game board is a property of the Game class. It consists of a grid of [rows, cols], typically
+    6x6 or 12x12. This is a matrix upon which the players place their pieces.
+    """
     def __init__(self, size_y, size_x):
         # GameBoard consists of a matrix of x by y elements (usually 12 by 12)
         """
@@ -31,7 +32,8 @@ class GameBoard:
             size_y = 12  # default to 12 if receiving invalid input
             print("Invalid integer size for y. Changed to y=12")
 
-        self.Grid = np.zeros([size_y, size_x], dtype=int)
+        self.Grid = np.zeros([size_y, size_x], dtype=int)  # This is the main matrix
+
         self.ROW_COUNT = size_x
         self.COL_COUNT = size_y
 
@@ -39,4 +41,3 @@ class GameBoard:
         self.SPOT_TOP_RIGHT = (0, size_x - 1)
         self.SPOT_BOTTOM_LEFT = (size_y - 1, 0)
         self.SPOT_BOTTOM_RIGHT = (size_y - 1, size_x - 1)
-
