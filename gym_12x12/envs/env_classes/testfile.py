@@ -1,6 +1,8 @@
 from gym_12x12.envs.env_classes.game import Game
 from gym_12x12.envs.env_classes.player import Player, AIPlayer, HumanPlayer
+import time
 
+start_time = time.time()
 p1 = AIPlayer()
 p2 = AIPlayer()
 gme = Game(p1, p2)
@@ -18,11 +20,16 @@ gme.place_piece(p2, 6, 5)
 gme.place_piece(p2, 5, 4)
 gme.place_piece(p2, 5, 6)
 
-gme.place_piece(p2, 0, 5)
+gme.place_piece(p2, 0, 11)
 
-gme.place_piece(p1, 0, 4)
-gme.place_piece(p1, 0, 6)
-gme.place_piece(p1, 1, 5)
+gme.place_piece(p1, 0, 10)
+gme.place_piece(p1, 1, 11)
+
+
 
 print(gme.Board.Grid)
-gme.sweep_board()
+
+
+#gme.sweep_board()
+
+print("My program took", time.time() - start_time, "to run")

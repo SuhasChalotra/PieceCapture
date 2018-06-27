@@ -35,8 +35,8 @@ class Game:
         self.Board = gb(size_y=rows, size_x=cols)
 
         # These fields keep track of players' scores
-        self.BlueScore = 0
-        self.RedScore = 0
+        self.PlayerOneScore = 0
+        self.PlayerTwoScore = 0
 
     def __assign_player_piece_color(self):
         """
@@ -73,6 +73,7 @@ class Game:
         if self.Board.Grid[yloc, xloc] == Game.EMPTY:  # Empty slot to play
             self.Board.Grid[yloc, xloc] = arg_player.piece_color
             #self.sweep_board()
+            print(self.reward_check(yloc, xloc))
             return Game.GAME_MOVE_VALID
 
         else:
@@ -113,8 +114,41 @@ class Game:
                         int_blue_score_tally += 1
 
         # calc the final score count
-        self.BlueScore = int_blue_score_tally
-        self.RedScore = int_red_score_tally
+        self.PlayerOneScore = int_blue_score_tally
+        self.PlayerTwoScore = int_red_score_tally
+
+    def reward_check(self,row, col):
+        """
+        This function is the alternative to sweep board, which sweeps the entire board and re-tallies the entire score.
+        Instead this function should only check the piece currently placed and its surroundings
+        :param row:
+        :param col:
+        :return:
+        """
+        int_blue_score_tally = 0
+        int_red_score_tally = 0
+
+        surrounding_pieces = self.get_surrounding_pieces(row, col)
+
+        #First check if current piece is surrounded
+        if self.piece_surrounded_alt(row, col, adjacent_pieces=surrounding_pieces):
+            if self.Board.Grid[row, col] == Game.BLUE_PIECE:
+                int_red_score_tally += 1
+            elif self.Board.Grid[row, col] == Game.RED_PIECE:
+                int_blue_score_tally += 1
+
+        #Now we check the adjacent pieces to see if they got surrounded
+        for piece in surrounding_pieces:
+            if self.Board.Grid[piece[0], piece[1]] == Game.EMPTY:
+                continue
+            elif self.piece_surrounded_alt(piece[0], piece[1]):
+                if self.Board.Grid[piece[0], piece[1]] == Game.BLUE_PIECE:
+                    int_red_score_tally += 1
+                elif self.Board.Grid[piece[0], piece[1]] == Game.RED_PIECE:
+                    int_blue_score_tally += 1
+
+        return [int_blue_score_tally, int_red_score_tally]
+
 
     def __is_piece_surrounded(self, at_row, at_col):
         """
@@ -205,8 +239,13 @@ class Game:
 
         return True
 
-    def piece_surrounded_alt(self,row, col):
-        surrounding_pieces = self.get_surrounding_pieces(row,col)
+    def piece_surrounded_alt(self,row, col, adjacent_pieces = None):
+
+        if not adjacent_pieces:
+            surrounding_pieces = self.get_surrounding_pieces(row,col)
+        else:
+            surrounding_pieces = adjacent_pieces
+
         opp_color = self.__get_opposing_color(self.Board.Grid[row, col])
 
         for piece in surrounding_pieces:
@@ -221,9 +260,20 @@ class Game:
         :param col:
         :return:
         """
-        output = [[row-1,col],[row+1,col],[row,col+1],[row,col-1]]
-        for item in output:
-            if item[0] < 0 or item[1] < 0 or item[0] >= self.Board.ROW_COUNT or item[1] >= self.Board.COL_COUNT:
-                output.remove(item)
+        output = [[row-1,col],[row+1,col],[row,col+1],[row,col-1]] # These are the top, bottom, right and left pieces
+        row_checker = 0
+
+        if row == 0:
+            output.pop(0)
+            row_checker += 1
+        elif row == (self.Board.ROW_COUNT - 1):
+            output.pop(1)
+            row_checker += 1
+
+        if col == 0: output.pop(3-row_checker)
+        elif col == (self.Board.COL_COUNT - 1): output.pop(2-row_checker)
 
         return output
+
+
+
