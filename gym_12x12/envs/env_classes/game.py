@@ -72,7 +72,7 @@ class Game:
 
         if self.Board.Grid[yloc, xloc] == Game.EMPTY:  # Empty slot to play
             self.Board.Grid[yloc, xloc] = arg_player.piece_color
-            self.sweep_board()
+            #self.sweep_board()
             return Game.GAME_MOVE_VALID
 
         else:
@@ -104,12 +104,12 @@ class Game:
                 if self.Board.Grid[r_rows, c_cols] == Game.EMPTY:
                     continue  # go to next iteration
                 if self.Board.Grid[r_rows, c_cols] == Game.BLUE_PIECE:
-                    if self.__is_piece_surrounded(r_rows, c_cols):
-                        print("Red scores a point")
+                    if self.piece_surrounded_alt(r_rows, c_cols):
+                        print("Red scores a point",r_rows,c_cols)
                         int_red_score_tally += 1
                 elif self.Board.Grid[r_rows, c_cols] == Game.RED_PIECE:
-                    if self.__is_piece_surrounded(r_rows, c_cols):
-                        print("Blue scores a point")
+                    if self.piece_surrounded_alt(r_rows, c_cols):
+                        print("Blue scores a point",r_rows,c_cols)
                         int_blue_score_tally += 1
 
         # calc the final score count
@@ -210,8 +210,9 @@ class Game:
         opp_color = self.__get_opposing_color(self.Board.Grid[row, col])
 
         for piece in surrounding_pieces:
-            if self.Board.Grid[piece[0],piece[1]] == opp_color:
-                return True
+            if self.Board.Grid[piece[0],piece[1]] != opp_color:
+                return False
+        return True
 
     def get_surrounding_pieces(self, row, col):
         """
