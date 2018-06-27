@@ -42,16 +42,22 @@ class HumanPlayer (Player):
 
 class AIPlayer (Player):
     """
-    A AI Player
+    An AI Player
     """
     def __init__(self):
         pass
+
+    def get_strategies(self, game_board):
+        """
+        :param game_board: the current game board
+        :return: should return [row, col] indicating where to play next
+        """
 
 
 class Strategy:
     """" Strategies are objects that contain info on possible moves the AI can make. When the game board state is 
     scanned / evaluated by the AI, the AI will store-up some possible strategies and then determine 'possible_plays',
-    which are simply x,y of where to place the next move
+    which are simply [row, col] of where to place the next move
     """""
     priority_level = 0  # holds the strategy priority level
     center = ()  # a strategy centers around a center tile of which we get the surrounding tiles, it will be a tuple

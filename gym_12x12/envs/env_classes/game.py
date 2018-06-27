@@ -72,7 +72,7 @@ class Game:
 
         if self.Board.Grid[yloc, xloc] == Game.EMPTY:  # Empty slot to play
             self.Board.Grid[yloc, xloc] = arg_player.piece_color
-            #self.sweep_board()
+            # self.sweep_board()
             print(self.reward_check(yloc, xloc))
             return Game.GAME_MOVE_VALID
 
@@ -117,7 +117,7 @@ class Game:
         self.PlayerOneScore = int_blue_score_tally
         self.PlayerTwoScore = int_red_score_tally
 
-    def reward_check(self,row, col):
+    def reward_check(self, row, col):
         """
         This function is the alternative to sweep board, which sweeps the entire board and re-tallies the entire score.
         Instead this function should only check the piece currently placed and its surroundings
@@ -130,14 +130,14 @@ class Game:
 
         surrounding_pieces = self.get_surrounding_pieces(row, col)
 
-        #First check if current piece is surrounded
+        # First check if current piece is surrounded
         if self.piece_surrounded_alt(row, col, adjacent_pieces=surrounding_pieces):
             if self.Board.Grid[row, col] == Game.BLUE_PIECE:
                 int_red_score_tally += 1
             elif self.Board.Grid[row, col] == Game.RED_PIECE:
                 int_blue_score_tally += 1
 
-        #Now we check the adjacent pieces to see if they got surrounded
+        # Now we check the adjacent pieces to see if they got surrounded
         for piece in surrounding_pieces:
             if self.Board.Grid[piece[0], piece[1]] == Game.EMPTY:
                 continue
