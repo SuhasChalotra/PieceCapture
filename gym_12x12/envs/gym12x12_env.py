@@ -64,8 +64,8 @@ class gym12x12_env(gym.Env):
         """
         if player_type == PLAYERTYPE_HUMAN:
 
-            return HumanPlayer(Game.BLUE)
+            return HumanPlayer()
         else:
-            return AIPlayer(Game.RED)
+            return AIPlayer()
 
 

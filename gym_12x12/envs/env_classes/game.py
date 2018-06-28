@@ -38,6 +38,9 @@ class Game:
         self.PlayerOneScore = 0
         self.PlayerTwoScore = 0
 
+        # Keep track of the move number
+        self.MoveNumber = 0
+
     def __assign_player_piece_color(self):
         """
         This private method will ensure that the Player1 is BLUE and Player2 is RED
@@ -73,7 +76,8 @@ class Game:
         if self.Board.Grid[yloc, xloc] == Game.EMPTY:  # Empty slot to play
             self.Board.Grid[yloc, xloc] = arg_player.piece_color
             # self.sweep_board()
-            print(self.reward_check(yloc, xloc))
+            print("Reward check on Move # ", self.MoveNumber, self.reward_check(yloc, xloc))
+            self.MoveNumber += 1  # Increment
             return Game.GAME_MOVE_VALID
 
         else:
