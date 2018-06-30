@@ -1,6 +1,5 @@
-from gym_12x12.envs.env_classes.player import Player, AIPlayer, HumanPlayer
 from gym_12x12.envs.env_classes.gameboard import GameBoard as gb
-import numpy as np
+from gym_12x12.envs.env_classes.player import Player
 
 
 class Game:
@@ -246,7 +245,7 @@ class Game:
     def piece_surrounded_alt(self,row, col, adjacent_pieces = None):
 
         if not adjacent_pieces:
-            surrounding_pieces = self.get_surrounding_pieces(row,col)
+            surrounding_pieces = self.get_surrounding_pieces(row, col)
         else:
             surrounding_pieces = adjacent_pieces
 
@@ -278,6 +277,5 @@ class Game:
         elif col == (self.Board.COL_COUNT - 1): output.pop(2-row_checker)
 
         return output
-
 
 

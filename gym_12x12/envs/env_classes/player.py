@@ -47,23 +47,45 @@ class AIPlayer (Player):
     def __init__(self):
         pass
 
-    def get_strategies(self, game_board):
+    def get_strategies(self, gamedata):
         """
-        :param game_board: the current game board
+        :param gamedata: the current game board
         :return: should return [row, col] indicating where to play next
         """
 
+        list_of_strategies = [] # Blank List
+
+        for rows in range(0, len(gamedata.Board.Grid)):
+            for cols in range(rows):
+                s = Strategy(gamedata, [rows, cols])
+                list_of_strategies.append(s)  # Add
+
 
 class Strategy:
-    """" Strategies are objects that contain info on possible moves the AI can make. When the game board state is 
+    """" Strategies are objects that contain info on possible moves the AI can make. When the game board state is
     scanned / evaluated by the AI, the AI will store-up some possible strategies and then determine 'possible_plays',
     which are simply [row, col] of where to place the next move
-    """""
+
     priority_level = 0  # holds the strategy priority level
     center = ()  # a strategy centers around a center tile of which we get the surrounding tiles, it will be a tuple
     possible_plays = []  # this should be a list of x,y for possible plays in this strategy
     surrounding_tiles = []  # this should be a list of x,y co-ordinates (max 4, min 2) of tiles that surround the center
+    """
 
-    def __init__(self):
-        pass
+    def __init__(self, arg_game_reference, arg_center):
+        self.Game = arg_game_reference  # This basically holds a reference to the current gameboard
+        self.center = arg_center
+        self.priority_level = 0
+        self.possible_plays = []
 
+        row, cols = arg_center
+        self.surrounding_tiles = self.Game.get_surrounding_pieces(row, cols)
+
+        # Calculate possible plays
+        print("length of surrounding tiles =", len(self.surrounding_tiles))
+        print("surrounding tiles index 0 is", self.surrounding_tiles[0])
+        for piece in range(0, len(self.surrounding_tiles)):
+            r, c = self.surrounding_tiles[piece]
+            if self.Game.Board.Grid[r, c] == 0:
+                self.possible_plays.append([r, c])
+                print("Tally possible plays =", len(self.possible_plays))
