@@ -47,26 +47,25 @@ class AIPlayer (Player):
     def __init__(self):
         pass
 
-    def get_all_possible_strategies(self, gamedata):
+    def get_strategies(self, game_object_reference):
         """
         :param gamedata: the current game board
         :return: should return [row, col] indicating where to play next
         """
 
-        list_of_strategies = [] # Blank List
+        list_of_strategies = [] # Blank List of all possible strategies centered around a piece
 
-        for rows in range(0, len(gamedata.Board.Grid)):
-            for cols in range(0, gamedata.Board.COL_COUNT):
-                print("cols=", cols)
-                s = Strategy(gamedata, [rows, cols])
+        for rows in range(0, len(game_object_reference.Board.Grid)):
+            for cols in range(0, game_object_reference.Board.COL_COUNT):
+                s = Strategy(game_object_reference, [rows, cols])
                 list_of_strategies.append(s)  # Add
 
-        print ("Total number of list_of_strategies", len(list_of_strategies))
-        return list_of_strategies # Return a List
+        print("Total number of list_of_strategies", len(list_of_strategies))
 
-    def do_ai_move(self):
-        # Essentially returns a [row, col] causing the AI to make a move after analyzing its logic
-        pass
+        # Create a list of strategies which will cause the AI to win on the next move
+        list_winning_move_strategies = Strategy.get_point_scoring_strategies(list_of_strategies, self._p_piece_color)
+
+        return list_of_strategies # Return a List
 
 
 class Strategy:
@@ -90,11 +89,17 @@ class Strategy:
         self.surrounding_tiles = arg_game_reference.get_surrounding_pieces(row, cols)
 
         # Calculate possible plays
-        print("strategy centered on", self.center)
-        print("length of surrounding tiles =", len(self.surrounding_tiles))
-        print("surrounding tiles index 0 is", self.surrounding_tiles[0])
+        # print("strategy centered on", self.center)
+        # print("length of surrounding tiles =", len(self.surrounding_tiles))
+        # print("surrounding tiles index 0 is", self.surrounding_tiles[0])
         for piece in range(0, len(self.surrounding_tiles)):
             r, c = self.surrounding_tiles[piece]
             if arg_game_reference.Board.Grid[r, c] == 0:  # Only add a possible play if the [r,c] is empty (0)
                 self.possible_plays.append([r, c])
-                print("Tally possible plays =", len(self.possible_plays))
+
+
+    @staticmethod
+    def get_point_scoring_strategies(arg_raw_list, AIPiece):
+        # go through the raw list and only
+        return lst
+
