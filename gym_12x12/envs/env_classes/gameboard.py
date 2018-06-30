@@ -41,3 +41,25 @@ class GameBoard:
         self.SPOT_TOP_RIGHT = (0, size_x - 1)
         self.SPOT_BOTTOM_LEFT = (size_y - 1, 0)
         self.SPOT_BOTTOM_RIGHT = (size_y - 1, size_x - 1)
+
+    def get_surrounding_pieces(self, row, col):
+        """
+        This function will return  a list of the 2-4 surrounding pieces
+        :param row:
+        :param col:
+        :return:
+        """
+        output = [[row-1,col],[row+1,col],[row,col+1],[row,col-1]] # These are the top, bottom, right and left pieces
+        row_checker = 0
+
+        if row == 0:
+            output.pop(0)
+            row_checker += 1
+        elif row == (self.ROW_COUNT - 1):
+            output.pop(1)
+            row_checker += 1
+
+        if col == 0: output.pop(3-row_checker)
+        elif col == (self.COL_COUNT - 1): output.pop(2-row_checker)
+
+        return output
