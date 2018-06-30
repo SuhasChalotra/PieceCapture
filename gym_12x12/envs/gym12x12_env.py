@@ -49,6 +49,7 @@ class gym12x12_env(gym.Env):
         self.Player2 = argPlayer2
         self.Game = Game(self.Player1, self.Player2, size_y=size_rows, size_x=size_cols)
         self.CurrentPlayer = self.Player1
+        # self.Game.Board.Grid.
 
     def close(self):
         pass

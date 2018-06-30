@@ -1,5 +1,6 @@
 from gym_12x12.envs.env_classes.game import Game
 from gym_12x12.envs.env_classes.player import AIPlayer, HumanPlayer
+import math
 import time
 
 start_time = time.time()
@@ -27,3 +28,6 @@ while gme.is_game_completed == false:
 """
 p1.get_strategies(gme)
 print("My program took", time.time() - start_time, "to run")
+
+
+

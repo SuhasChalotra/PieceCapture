@@ -101,5 +101,5 @@ class Strategy:
     @staticmethod
     def get_point_scoring_strategies(arg_raw_list, AIPiece):
         # go through the raw list and only
-        return lst
+        pass
 
