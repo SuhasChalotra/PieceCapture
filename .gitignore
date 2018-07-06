@@ -2,5 +2,5 @@
 /gym_12x12/gym.DS_Store
 /gym_12x12/envs/.DS_Store
 .DS_Store
-.idea/**
+.idea/workspace.xml
 /venv
