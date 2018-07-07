@@ -9,8 +9,6 @@ PLAYERTYPE_AI = 1
 class gym12x12_env(gym.Env):
 
     def __init__(self):
-        self.Player1 = None
-        self.Player2 = None
         self.Game = None
         self.CurrentPlayer = None
 
@@ -24,10 +22,10 @@ class gym12x12_env(gym.Env):
 
         output = self.Game.place_piece(self.CurrentPlayer, action[0], action[1])
         if output == Game.GAME_MOVE_VALID:
-            if self.CurrentPlayer == self.Player1:
-                self.CurrentPlayer = self.Player2
+            if self.CurrentPlayer == self.Game.Player1:
+                self.CurrentPlayer = self.Game.Player2
             else:
-                self.CurrentPlayer = self.Player1
+                self.CurrentPlayer = self.Game.Player1
 
         #Add a check for rewards
 
@@ -36,8 +34,9 @@ class gym12x12_env(gym.Env):
     def render(self):
         self.Game.print_game_board()  # Prints the game board
 
-    def reset(self, argPlayer1, argPlayer2, size_rows=12, size_cols=12):
+    def reset(self):
         """
+        self, argPlayer1, argPlayer2, size_rows=12, size_cols=12
         Resets the fields. Defaults the current player to Player1
         :param argPlayer1: Player1
         :param argPlayer2: Player2
@@ -68,5 +67,10 @@ class gym12x12_env(gym.Env):
             return HumanPlayer()
         else:
             return AIPlayer()
+
+    def initiate_game(self, arg_player1, arg_player2, arg_int_boardsize):
+
+        self.Game = Game(arg_player1, arg_player2, rows=arg_int_boardsize, cols=arg_int_boardsize)
+        self.CurrentPlayer = self.Player1
 
 
