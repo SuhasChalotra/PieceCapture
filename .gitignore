@@ -5,3 +5,4 @@
 .idea/workspace.xml
 /venv
 __pycache__/
+/gym_12x12/envs/env_classes/__pycache__/
