@@ -63,3 +63,7 @@ class GameBoard:
         elif col == (self.COL_COUNT - 1): output.pop(2-row_checker)
 
         return output
+
+    def clear(self):
+        # Clear the game grid
+        self.Grid = np.zeros([self.ROW_COUNT, self.COL_COUNT], dtype=int)

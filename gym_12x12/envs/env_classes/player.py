@@ -1,4 +1,6 @@
 from abc import ABC, ABCMeta, abstractmethod
+import numpy as np
+from random import randint
 
 # Games need players. But we should only be able to instantiate a HumanPlayer or an AIPlayer
 # The Class 'Player' is abstract
@@ -39,6 +41,10 @@ class HumanPlayer (Player):
     def __init__(self):
         pass
 
+class AgentPlayer (Player) :
+
+    def __init__(self):
+        pass
 
 class AIPlayer (Player):
     """
@@ -66,6 +72,16 @@ class AIPlayer (Player):
         list_winning_move_strategies = Strategy.get_point_scoring_strategies(list_of_strategies, self._p_piece_color)
 
         return list_of_strategies # Return a List
+
+    def make_random_move(self, empty_move_list):
+        """
+        This function returns a random spot to play
+        :param game_object_reference: the NPZeros array
+        :return: [row,col]
+        """
+        if isinstance(empty_move_list, list):
+            choice = randint(0, len(empty_move_list))
+            return empty_move_list.pop(choice)
 
 
 class Strategy:

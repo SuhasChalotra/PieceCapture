@@ -39,6 +39,12 @@ class Game:
 
         # Keep track of the move number
         self.MoveNumber = 0
+        self.empty_spots = []
+
+        #Populate the empty spots list
+        for x in range(rows):
+            for y in range(cols):
+                self.empty_spots.append((x, y))
 
     def __assign_player_piece_color(self):
         """
@@ -74,6 +80,8 @@ class Game:
 
         if self.Board.Grid[yloc, xloc] == Game.EMPTY:  # Empty slot to play
             self.Board.Grid[yloc, xloc] = arg_player.piece_color
+            self.empty_spots.remove(yloc, xloc)
+
             # self.sweep_board()
             print("Reward check on Move # ", self.MoveNumber, self.reward_check(yloc, xloc))
             self.MoveNumber += 1  # Increment
@@ -277,5 +285,3 @@ class Game:
         elif col == (self.Board.COL_COUNT - 1): output.pop(2-row_checker)
 
         return output
-
-

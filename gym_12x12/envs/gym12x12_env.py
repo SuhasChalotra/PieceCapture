@@ -1,6 +1,7 @@
 import gym
 from gym_12x12.envs.env_classes.player import Player, HumanPlayer, AIPlayer
 from gym_12x12.envs.env_classes.game import Game
+from gym import spaces
 
 PLAYERTYPE_HUMAN = 0
 PLAYERTYPE_AI = 1
@@ -11,6 +12,8 @@ class gym12x12_env(gym.Env):
     def __init__(self):
         self.Game = None
         self.CurrentPlayer = None
+        self.action_space = None
+        self.observation_space = None
 
     def step(self, action):
         """
@@ -44,10 +47,12 @@ class gym12x12_env(gym.Env):
         :param size_cols: y size of game board (default = 12)
         :return:
         """
-        self.Player1 = argPlayer1
-        self.Player2 = argPlayer2
-        self.Game = Game(self.Player1, self.Player2, size_y=size_rows, size_x=size_cols)
-        self.CurrentPlayer = self.Player1
+
+        self.Game.Board.clear()
+        self.CurrentPlayer = self.Game.Player1
+
+        if isinstance(AIPlayer, self.Game.Player1):
+            self.Game.place_piece(self.CurrentPlayer,)
         # self.Game.Board.Grid.
 
     def close(self):
@@ -72,5 +77,7 @@ class gym12x12_env(gym.Env):
 
         self.Game = Game(arg_player1, arg_player2, rows=arg_int_boardsize, cols=arg_int_boardsize)
         self.CurrentPlayer = self.Player1
+        self.action_space = spaces.Discrete(arg_int_boardsize * arg_int_boardsize)
+        self.observation_space = spaces.Box(3, arg_int_boardsize, arg_int_boardsize)
 
 
