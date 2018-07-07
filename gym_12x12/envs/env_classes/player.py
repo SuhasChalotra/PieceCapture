@@ -1,5 +1,4 @@
 from abc import ABC, ABCMeta, abstractmethod
-import numpy as np
 from random import randint
 
 # Games need players. But we should only be able to instantiate a HumanPlayer or an AIPlayer
@@ -41,12 +40,14 @@ class HumanPlayer (Player):
     def __init__(self):
         pass
 
-class AgentPlayer (Player) :
+
+class AgentPlayer (Player):
 
     def __init__(self):
         pass
 
-class AIPlayer (Player):
+
+class BotPlayer (Player):
     """
     An AI Player
     """
@@ -59,7 +60,7 @@ class AIPlayer (Player):
         :return: should return [row, col] indicating where to play next
         """
 
-        list_of_strategies = [] # Blank List of all possible strategies centered around a piece
+        list_of_strategies = []  # Blank List of all possible strategies centered around a piece
 
         for rows in range(0, len(game_object_reference.Board.Grid)):
             for cols in range(0, game_object_reference.Board.COL_COUNT):
@@ -69,7 +70,10 @@ class AIPlayer (Player):
         print("Total number of list_of_strategies", len(list_of_strategies))
 
         # Create a list of strategies which will cause the AI to win on the next move
-        list_winning_move_strategies = Strategy.get_point_scoring_strategies(list_of_strategies, self._p_piece_color)
+
+        # Create a list of strategies where AI must block its opponent from scoring
+
+        # Create a list of strategies that allow the AI to get a point
 
         return list_of_strategies # Return a List
 
@@ -77,11 +81,15 @@ class AIPlayer (Player):
         """
         This function returns a random spot to play
         :param game_object_reference: the NPZeros array
+        :empty_move_list: the cached list of available moves
         :return: [row,col]
         """
         if isinstance(empty_move_list, list):
             choice = randint(0, len(empty_move_list))
             return empty_move_list.pop(choice)
+
+    def make_strategic_move(self, empty_move_list):
+        pass
 
 
 class Strategy:
@@ -98,11 +106,23 @@ class Strategy:
     def __init__(self, arg_game_reference, arg_center):
         # self.Game = arg_game_reference  # This basically holds a reference to the current gameboard
         self.center = arg_center
-        self.priority_level = 0
-        self.possible_plays = []
-
-        row, cols = arg_center
+        row, cols = arg_center  # extract from the tuple
         self.surrounding_tiles = arg_game_reference.get_surrounding_pieces(row, cols)
+
+        # Score building properties
+        self.score_building_priority_level = 0
+        self.is_score_building_opp = False
+        self.scoring_move = [-1, -1]  # set as the default to indicate no scoring move
+        self.score_builder = 0  # this should be 1 or 2, representing a player, or 0 for no player
+        self.scoring_player = 0  # should be either 1 or 2, or 0 if no player
+
+        self.possible_moves = []  # a list of tuples containing possible plays
+        self.tag = ""  # a general purpose string tag
+
+        # Blocking properties
+        self.is_block_opportunity = False
+        self.block_priority_level = 0
+        self.block_defender = 0  # should be 1 or 2 indicating the player, or 0 for no player (default)
 
         # Calculate possible plays
         # print("strategy centered on", self.center)
