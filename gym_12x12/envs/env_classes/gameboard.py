@@ -42,28 +42,61 @@ class GameBoard:
         self.SPOT_BOTTOM_LEFT = (size_y - 1, 0)
         self.SPOT_BOTTOM_RIGHT = (size_y - 1, size_x - 1)
 
-    def get_surrounding_pieces(self, row, col):
+    def get_surrounding_pieces(self, row, col, diagonals=False):
         """
         This function will return  a list of the 2-4 surrounding pieces
         :param row:
         :param col:
+        :param diagonals: if set to true, the surrounding pieces will be checked at the diagonal
+        ie. up-left, up-right, bottom-left, bottom-right
         :return:
         """
-        output = [[row-1,col],[row+1,col],[row,col+1],[row,col-1]] # These are the top, bottom, right and left pieces
-        row_checker = 0
+        output = []
+        if not diagonals:
+            # These are the top, bottom, right and left pieces
+            output = [[row-1,col],[row+1,col],[row,col+1],[row,col-1]]
+            row_checker = 0
 
-        if row == 0:
-            output.pop(0)
-            row_checker += 1
-        elif row == (self.ROW_COUNT - 1):
-            output.pop(1)
-            row_checker += 1
+            if row == 0:
+                output.pop(0)
+                row_checker += 1
+            elif row == (self.ROW_COUNT - 1):
+                output.pop(1)
+                row_checker += 1
 
-        if col == 0: output.pop(3-row_checker)
-        elif col == (self.COL_COUNT - 1): output.pop(2-row_checker)
+            if col == 0:
+                output.pop(3 - row_checker)
+            elif col == (self.COL_COUNT - 1):
+                output.pop(2 - row_checker)
+        else:
+            # These are the diagonals from the center piece at question
+            output = [[row - 1, col - 1], [row - 1, col + 1], [row + 1, col - 1], [row + 1, col + 1]]
+            output = self._remove_invalid_tuples(output)
 
         return output
 
     def clear(self):
         # Clear the game grid
         self.Grid = np.zeros([self.ROW_COUNT, self.COL_COUNT], dtype=int)
+
+    def _remove_invalid_tuples(self, surrounding_p):
+        """
+        This function removes any tuples [row, col] where row and/or col are out of bounds
+        :param surrounding_p: a list of surrounding pieces
+        :return: a list of surrounding pieces that only has valid [row, col]
+        """
+        return_list = []
+
+        if isinstance(surrounding_p, list):
+
+            for co_ord in range(len(surrounding_p)):
+                row, col = surrounding_p[co_ord]
+
+                if row >= 0 and row < self.ROW_COUNT:
+                    if col >= 0 and col < self.COL_COUNT:
+                        return_list.append(surrounding_p[co_ord])
+
+        else:
+            raise ValueError("Not a list")
+
+        return return_list

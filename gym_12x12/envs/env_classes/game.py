@@ -18,9 +18,10 @@ class Game:
         :param cols: on the X-axis [rows, cols]
         """
         # Must ensure that the correct object type is passed as parameters
-
+        print(type(player_1))
         if isinstance(player_1, Player):
             self.Player1 = player_1
+
         else:
             raise ValueError("Player 1: type must be of type Player")
 

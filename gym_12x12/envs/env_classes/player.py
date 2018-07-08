@@ -54,7 +54,7 @@ class BotPlayer (Player):
     def __init__(self):
         pass
 
-    def get_strategies(self, game_object_reference):
+    def get_strategies(self, arg_game_board_reference):
         """
         :param gamedata: the current game board
         :return: should return [row, col] indicating where to play next
@@ -62,9 +62,9 @@ class BotPlayer (Player):
 
         list_of_strategies = []  # Blank List of all possible strategies centered around a piece
 
-        for rows in range(0, len(game_object_reference.Board.Grid)):
-            for cols in range(0, game_object_reference.Board.COL_COUNT):
-                s = Strategy(game_object_reference, [rows, cols])
+        for rows in range(0, len(arg_game_board_reference.Grid)):
+            for cols in range(0, arg_game_board_reference.COL_COUNT):
+                s = Strategy(arg_game_board_reference, [rows, cols])
                 list_of_strategies.append(s)  # Add
 
         print("Total number of list_of_strategies", len(list_of_strategies))
@@ -80,7 +80,6 @@ class BotPlayer (Player):
     def make_random_move(self, empty_move_list):
         """
         This function returns a random spot to play
-        :param game_object_reference: the NPZeros array
         :empty_move_list: the cached list of available moves
         :return: [row,col]
         """
@@ -103,11 +102,12 @@ class Strategy:
     surrounding_tiles = []  # this should be a list of x,y co-ordinates (max 4, min 2) of tiles that surround the center
     """
 
-    def __init__(self, arg_game_reference, arg_center):
+    def __init__(self, arg_game_board_reference, arg_center):
         # self.Game = arg_game_reference  # This basically holds a reference to the current gameboard
         self.center = arg_center
-        row, cols = arg_center  # extract from the tuple
-        self.surrounding_tiles = arg_game_reference.get_surrounding_pieces(row, cols)
+        row, col = arg_center  # extract from the tuple
+        self.surrounding_tiles = arg_game_board_reference.get_surrounding_pieces(row, col, diagonals=False)
+        self.surrounding_tiles_diagonal = arg_game_board_reference.get_surrounding_pieces(row, col, diagonals=True)
 
         # Score building properties
         self.score_building_priority_level = 0
@@ -116,7 +116,9 @@ class Strategy:
         self.score_builder = 0  # this should be 1 or 2, representing a player, or 0 for no player
         self.scoring_player = 0  # should be either 1 or 2, or 0 if no player
 
-        self.possible_moves = []  # a list of tuples containing possible plays
+        # Possible moves
+        self.possible_moves = []  # a list of tuples containing possible plays (straight)
+        self.possible_moves_diagonal = []  # diagonal
         self.tag = ""  # a general purpose string tag
 
         # Blocking properties
@@ -130,8 +132,8 @@ class Strategy:
         # print("surrounding tiles index 0 is", self.surrounding_tiles[0])
         for piece in range(0, len(self.surrounding_tiles)):
             r, c = self.surrounding_tiles[piece]
-            if arg_game_reference.Board.Grid[r, c] == 0:  # Only add a possible play if the [r,c] is empty (0)
-                self.possible_plays.append([r, c])
+            if arg_game_board_reference.Grid[r, c] == 0:  # Only add a possible play if the [r,c] is empty (0)
+                self.possible_moves.append([r, c])
 
 
     @staticmethod
@@ -139,3 +141,23 @@ class Strategy:
         # go through the raw list and only
         pass
 
+    def get_possible_moves(self, boardstate, diagonals=False):
+        """
+        :param argSurrounding_Pieces: the surrounding pieces
+        :param boardstate: reference to the gameboard
+        :return:
+        """
+        return_list = []
+        if diagonals == False:
+            for index in range(0, len(self.surrounding_tiles)):
+                r, c = self.surrounding_tiles[index]
+                if boardstate.Grid[r, c] == 0:
+                    return_list.append(self.surrounding_tiles[index])
+
+        else:
+            for index in range(0, len(self.surrounding_tiles_diagonal)):
+                r, c = self.surrounding_tiles_diagonal[index]
+                if boardstate.Grid[r, c] == 0:
+                    return_list.append(self.surrounding_tiles_diagonal[index])
+
+        return return_list
