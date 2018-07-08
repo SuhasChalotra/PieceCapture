@@ -1,11 +1,11 @@
 import gym
-from gym_12x12.envs.env_classes.player import Player, HumanPlayer, BotPlayer
+from gym_12x12.envs.env_classes.player import Player, HumanPlayer, BotPlayer, AgentPlayer
 from gym_12x12.envs.env_classes.game import Game
 from gym import spaces
 
-PLAYERTYPE_HUMAN = 0
-PLAYERTYPE_AI = 1
-
+PLAYERTYPE_HUMAN = 2
+PLAYERTYPE_AGENT = 1
+PLAYERTYPE_BOT = 0
 
 class gym12x12_env(gym.Env):
 
@@ -51,8 +51,12 @@ class gym12x12_env(gym.Env):
         self.Game.Board.clear()
         self.CurrentPlayer = self.Game.Player1
 
-        if isinstance(AIPlayer, self.Game.Player1):
-            self.Game.place_piece(self.CurrentPlayer,)
+        #If the player 1 is a bot that is supposed to make a move it does so in reset
+        if isinstance(BotPlayer, self.Game.Player1):
+            move = BotPlayer.make_random_move(self.Game.empty_spots)
+            self.Game.place_piece(self.CurrentPlayer,move[0], move[1])
+        return self.Game.Board.Grid
+
         # self.Game.Board.Grid.
 
     def close(self):
@@ -70,8 +74,14 @@ class gym12x12_env(gym.Env):
         if player_type == PLAYERTYPE_HUMAN:
 
             return HumanPlayer()
-        else:
-            return AIPlayer()
+
+        elif player_type == PLAYERTYPE_AGENT:
+
+            return AgentPlayer()
+
+        elif player_type == PLAYERTYPE_BOT:
+
+            return BotPlayer()
 
     def initiate_game(self, arg_player1, arg_player2, arg_int_boardsize):
 
