@@ -100,3 +100,22 @@ class GameBoard:
             raise ValueError("Not a list")
 
         return return_list
+
+    def get_count_of(self, piece_color, in_list):
+        """
+        :param piece_color: 0, 1 or 2 - the items we are looking for
+        :param in_list: a list
+        :return: returns an integer containing the amount of times piece_color appears in the array
+        """
+
+        count = 0
+        if isinstance(in_list, list) or isinstance(in_list, tuple):
+            for i in range(0, len(in_list)):
+                r, c = in_list[i]
+                if self.Grid[r, c] == piece_color:
+                    count += 1
+
+        else:
+            raise ValueError("in_list must be a list or tuple")
+
+        return count

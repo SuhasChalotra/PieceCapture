@@ -32,6 +32,17 @@ class Player (ABC):
     def name(self, value):
         self._p_name = value
 
+    def get_opp_color(self):
+        """
+
+        :return: the opposite piece color to the player
+        """
+        if self.piece_color == 1:
+            return 2
+        elif self.piece_color == 2:
+            return 1
+        else:
+            return 0 # Invalid
 
 class HumanPlayer (Player):
     """
@@ -56,11 +67,11 @@ class BotPlayer (Player):
 
     def get_strategies(self, arg_game_board_reference):
         """
-        :param gamedata: the current game board
+        :param arg_game_board_reference: the current state of the game board
         :return: should return [row, col] indicating where to play next
         """
 
-        list_of_strategies = []  # Blank List of all possible strategies centered around a piece
+        list_of_strategies = []  # Blank List of all possible strategies centered around a  at [rows, cols]
 
         for rows in range(0, len(arg_game_board_reference.Grid)):
             for cols in range(0, arg_game_board_reference.COL_COUNT):
@@ -69,11 +80,11 @@ class BotPlayer (Player):
 
         print("Total number of list_of_strategies", len(list_of_strategies))
 
-        # Create a list of strategies which will cause the AI to win on the next move
+        # Create a sub-list of strategies which will cause the AI to win on the next move
 
-        # Create a list of strategies where AI must block its opponent from scoring
+        # Create a sub-list of strategies where AI must block its opponent from scoring
 
-        # Create a list of strategies that allow the AI to get a point
+        # Create a sub-list of strategies that allow the AI to play moves that will lead it to a score a point
 
         return list_of_strategies # Return a List
 
@@ -89,6 +100,32 @@ class BotPlayer (Player):
 
     def make_strategic_move(self, empty_move_list):
         pass
+
+    def will_move_endanger_player(self, move, board_ref):
+        """
+
+        :param move: [row, col] where the AI is thinking about moving
+        :param board_ref reference to the game board
+        :return: bool, true if AI plays piece at [row, col] where the next move its opponent makes will cause
+        the opponent to score
+        """
+        opp_color = self.get_opp_color()
+        if isinstance(move, list) or isinstance(move, tuple):
+            # extract
+
+            r, c = move
+
+            if not board_ref.Grid[r, c] == 0:
+                raise ValueError("Unable to evaluate, as the move in question is not on an empty space.")
+
+            s_pieces = board_ref.get_surrounding_pieces(r, c, diagonals=False)
+            if board_ref.get_count_of(opp_color, s_pieces) == len(s_pieces) - 1 and board_ref.get_count_of(0, s_pieces) == 1:
+                return True
+
+            if board_ref.get_count_of(opp_color, s_pieces) == len(s_pieces):
+                return True
+
+        return False
 
 
 class Strategy:
