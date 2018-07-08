@@ -1,5 +1,6 @@
 from abc import ABC, ABCMeta, abstractmethod
 from random import randint
+from gym_12x12.envs.env_classes.gameboard import GameBoard
 
 # Games need players. But we should only be able to instantiate a HumanPlayer or an AIPlayer
 # The Class 'Player' is abstract
@@ -49,6 +50,7 @@ class HumanPlayer (Player):
     A human player will be prompted to make its move via the keyboard input
     """
     def __init__(self):
+        self.name = "Human"
         pass
 
 
@@ -63,6 +65,7 @@ class BotPlayer (Player):
     An AI Player
     """
     def __init__(self):
+        self.name = "Bot_Player"
         pass
 
     def get_strategies(self, arg_game_board_reference):
@@ -70,21 +73,21 @@ class BotPlayer (Player):
         :param arg_game_board_reference: the current state of the game board
         :return: should return [row, col] indicating where to play next
         """
+        if isinstance(arg_game_board_reference, GameBoard):
+            list_of_strategies = []  # Blank List of all possible strategies centered around a  at [rows, cols]
 
-        list_of_strategies = []  # Blank List of all possible strategies centered around a  at [rows, cols]
+            for rows in range(0, len(arg_game_board_reference.Grid)):
+                for cols in range(0, arg_game_board_reference.COL_COUNT):
+                    s = Strategy(arg_game_board_reference, [rows, cols])
+                    list_of_strategies.append(s)  # Add the strategy to our list of strategies
 
-        for rows in range(0, len(arg_game_board_reference.Grid)):
-            for cols in range(0, arg_game_board_reference.COL_COUNT):
-                s = Strategy(arg_game_board_reference, [rows, cols])
-                list_of_strategies.append(s)  # Add
+            print("Total number of list_of_strategies", len(list_of_strategies))
 
-        print("Total number of list_of_strategies", len(list_of_strategies))
+            # Create a sub-list of strategies which will cause the AI to win on the next move
 
-        # Create a sub-list of strategies which will cause the AI to win on the next move
+            # Create a sub-list of strategies where AI must block its opponent from scoring
 
-        # Create a sub-list of strategies where AI must block its opponent from scoring
-
-        # Create a sub-list of strategies that allow the AI to play moves that will lead it to a score a point
+            # Create a sub-list of strategies that allow the AI to play moves that will lead it to a score a point
 
         return list_of_strategies # Return a List
 
