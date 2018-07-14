@@ -48,14 +48,14 @@ class gym12x12_env(gym.Env):
                     # Bot Player, bot makes a move
                     bot_move = BotPlayer.get_random_move(self.Game.empty_spots)
 
-                    if bot_move[0] > 0:
+                    if bot_move[0] >= 0:
                         v, p1_r, p2_r = self.Game.place_piece(self.CurrentPlayer, bot_move)
                         agent_master_reward_tally += p1_r - p2_r  # Keep track of reward tally
 
                         self.CurrentPlayer = self.Game.Player1
                     else:
                         # No moves left. Game appears to be over
-                        done_flag = True;
+                        done_flag = True
 
                 elif isinstance(self.CurrentPlayer, HumanPlayer):
                     # Do something, but not implemented

@@ -100,7 +100,7 @@ class BotPlayer (Player):
         if isinstance(empty_move_list, list):
             if len(empty_move_list) > 0:
                 choice = randint(0, len(empty_move_list))
-                return empty_move_list.pop(choice)
+                return empty_move_list[choice]
             else:
                 return -1, -1  # Signifies that there are no empty moves left
 

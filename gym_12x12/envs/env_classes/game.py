@@ -8,7 +8,7 @@ class Game:
     EMPTY = 0
     RED_PIECE = 2
     BLUE_PIECE = 1
-
+    POINT_REWARD = 10
 
     def __init__(self, player_1, player_2, rows=12, cols=12):
         """
@@ -91,6 +91,7 @@ class Game:
             print("Reward check on Move # ", self.MoveNumber, self.reward_check(yloc, xloc))
             reward_results = self.reward_check(yloc, xloc)
             self.MoveNumber += 1  # Increment
+            self.empty_spots.remove((yloc, xloc))
             return Game.GAME_MOVE_VALID,  reward_results[0], reward_results[1]
 
         else:
@@ -118,9 +119,11 @@ class Game:
         # First check if current piece is surrounded
         if self.piece_surrounded_alt(row, col, adjacent_pieces=surrounding_pieces):
             if self.Board.Grid[row, col] == Game.BLUE_PIECE:
-                int_red_reward_tally += 1
+                int_red_reward_tally += Game.POINT_REWARD
+                self.PlayerTwoScore += 1
             elif self.Board.Grid[row, col] == Game.RED_PIECE:
-                int_blue_reward_tally += 1
+                self.PlayerOneScore += 1
+                int_blue_reward_tally += Game.POINT_REWARD
 
         # Now we check the adjacent pieces to see if they got surrounded
         for piece in surrounding_pieces:
@@ -128,75 +131,13 @@ class Game:
                 continue
             elif self.piece_surrounded_alt(piece[0], piece[1]):
                 if self.Board.Grid[piece[0], piece[1]] == Game.BLUE_PIECE:
-                    int_red_reward_tally += 1
+                    int_red_reward_tally += Game.POINT_REWARD
                     self.PlayerTwoScore += 1
                 elif self.Board.Grid[piece[0], piece[1]] == Game.RED_PIECE:
-                    int_blue_reward_tally += 1
+                    int_blue_reward_tally += Game.POINT_REWARD
                     self.PlayerOneScore += 1
 
         return [int_blue_reward_tally, int_red_reward_tally]
-
-    def __is_piece_surrounded(self, at_row, at_col):
-        """
-        This private function determines if a game piece located at [row, col] is surrounded by an opposing piece
-        :param at_row: on the Y axis
-        :param at_col: on the X axis
-        :return: boolean - if a piece located at [row, col] is surrounded, return True
-        """
-        opp_color = self.__get_opposing_color(self.Board.Grid[at_row, at_col])
-
-        # Check the corners
-        # Top LEFT
-        if (at_row, at_col) == self.Board.SPOT_TOP_LEFT:
-            if self.Board.Grid[at_row, at_col + 1] == opp_color and self.Board.Grid[at_row + 1, at_col] == opp_color:
-                return True
-
-        # TOP RIGHT
-        if (at_row, at_col) == self.Board.SPOT_TOP_RIGHT:
-            if self.Board.Grid[at_row, at_col - 1] == opp_color and self.Board.Grid[at_row + 1, at_col] == opp_color:
-                return True
-
-        # BOTTOM LEFT
-        if (at_row, at_col) == self.Board.SPOT_BOTTOM_LEFT:
-            if self.Board.Grid[at_row - 1, at_col] == opp_color and self.Board.Grid[at_row, at_col + 1] == opp_color:
-                return True
-        # BOTTOM RIGHT
-        if (at_row, at_col) == self.Board.SPOT_BOTTOM_RIGHT:
-            if self.Board.Grid[at_row - 1, at_col] == opp_color and self.Board.Grid[at_row, at_col - 1] == opp_color:
-                return True
-
-        # Check the outer edges (excluding corners)
-        # TOP EDGE
-        if at_row == 0 and at_col >= 1 and at_col <= self.Board.COL_COUNT - 2:
-            if self.Board.Grid[at_row, at_col - 1] == opp_color and self.Board.Grid[at_row + 1, at_col] and \
-                    self.Board.Grid[at_row, at_col + 1]:
-                return True
-
-        # BOTTOM edge
-        if at_row == self.Board.ROW_COUNT - 1 and at_col >= 1 and at_col <= self.Board.COL_COUNT - 2:
-            if self.Board.Grid[at_row, at_col - 1] == opp_color and self.Board.Grid[at_row - 1, at_col] and \
-                    self.Board.Grid[at_row, at_col + 1]:
-                return True
-
-        # LEFT EDGE
-        if at_col == 0 and at_row >= 1 and at_row <= self.Board.ROW_COUNT - 1:
-            if self.Board.Grid[at_row - 1, at_col] == opp_color and self.Board.Grid[at_row + 1, at_col] and \
-                    self.Board.Grid[at_row, at_col + 1]:
-                return True
-
-        # RIGHT EDGE
-        if at_col == self.Board.COL_COUNT - 1 and at_row >= 1 and at_row <= self.Board.ROW_COUNT - 2:
-            if self.Board.Grid[at_row - 1, at_col] == opp_color and self.Board.Grid[at_row, at_col - 1] and \
-                    self.Board.Grid[at_row + 1, at_col]:
-                return True
-
-        # Check for inner space
-        if self.Board.Grid[at_row, at_col - 1] == opp_color and self.Board.Grid[at_row - 1, at_col] == opp_color and \
-                self.Board.Grid[at_row, at_col + 1] == opp_color and self.Board.Grid[at_row + 1, at_col] == opp_color:
-            return True
-
-        #  When all else fails, return false
-        return False
 
     @staticmethod
     def __get_opposing_color(in_color):
@@ -214,16 +155,14 @@ class Game:
 
     def is_game_complete(self):
         """
-        Checks the game board for any empty spots. If none are available, then the game is complete and return true
-        else, return false.
+        Checks the empty_spots list. If its length is zero, the game is done, return true
+        otherwise return false.
         :return: boolean. returns True if there are no empty spots left on the game board
         """
-        for y_range in self.Board.Grid:
-            for x_range in y_range:
-                if self.Board.Grid[y_range, x_range] == Game.EMPTY:  # Encountered an empty tile. immediately return false
-                    return False
-
-        return True
+        if len(self.empty_spots) > 0:
+            return False
+        else:
+            return True
 
     def piece_surrounded_alt(self,row, col, adjacent_pieces = None):
 
