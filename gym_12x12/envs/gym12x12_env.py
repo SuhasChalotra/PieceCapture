@@ -22,14 +22,22 @@ class gym12x12_env(gym.Env):
          place the tile on the board(y, x)
         :return:
         """
-
+        agent_master_reward_tally = 0
         move_results, p1_reward, p2_reward = self.Game.place_piece(self.CurrentPlayer, action[0], action[1])
-        # The above MUST be agent's action and it must be Player1
+        # The above MUST be an agent's action and it must be Player1
         # we need a variable that keeps track of the reward for this immediate action in order to subtract it
         # later, depending on the BOT/Human move in response
 
+        agent_master_reward_tally += p1_reward - p2_reward
+
+        # Declare a done flag and info tag
         done_flag = self.Game.is_game_complete()
         info_tag = ""
+        if done_flag:
+            # The game is done
+            info_tag = "Game done."
+            return self.Game.Board.Grid, agent_master_reward_tally, done_flag, info_tag
+
         if move_results == Game.GAME_MOVE_VALID:
             if self.CurrentPlayer == self.Game.Player1:
                 self.CurrentPlayer = self.Game.Player2
@@ -38,11 +46,16 @@ class gym12x12_env(gym.Env):
 
                 if isinstance(self.CurrentPlayer, BotPlayer):
                     # Bot Player, bot makes a move
-                    bot_move = BotPlayer.make_random_move(self.Game.empty_spots)
-                    self.Game.place_piece(self.CurrentPlayer, bot_move)
+                    bot_move = BotPlayer.get_random_move(self.Game.empty_spots)
 
-                    # If the BOT scores, we need to do some calulation
-                    self.CurrentPlayer = self.Game.Player1
+                    if bot_move[0] > 0:
+                        v, p1_r, p2_r = self.Game.place_piece(self.CurrentPlayer, bot_move)
+                        agent_master_reward_tally += p1_r - p2_r  # Keep track of reward tally
+
+                        self.CurrentPlayer = self.Game.Player1
+                    else:
+                        # No moves left. Game appears to be over
+                        done_flag = True;
 
                 elif isinstance(self.CurrentPlayer, HumanPlayer):
                     # Do something, but not implemented
@@ -61,10 +74,20 @@ class gym12x12_env(gym.Env):
             if self.CurrentPlayer == self.Game.Player1:
                 self.CurrentPlayer = self.Game.Player2
                 # The bot or human player must make a move in response here
+                # Bot Player, bot makes a move
+                bot_move = BotPlayer.get_random_move(self.Game.empty_spots)
+                if bot_move[0] > 0:
+                    v, p1_r, p2_r = self.Game.place_piece(self.CurrentPlayer, bot_move)
+                    agent_master_reward_tally += p1_r - p2_r  # Keep track of reward tally
+                else:
+                    # Game appears to be finished as Bot has no more moves to make
+                    done_flag = True
             else:
                 # This case should never evaluate to true, if so there is a problem w/ code:
                 raise ValueError("This case should never evaluate to true as Player1 must be agent. Check code.")
-            return self.Game.Board.Grid, -1, done_flag, info_tag
+
+        done_flag = self.Game.is_game_complete()
+        return self.Game.Board.Grid, agent_master_reward_tally, done_flag, info_tag
 
         # Add a check for rewards
 
@@ -102,11 +125,12 @@ class gym12x12_env(gym.Env):
         # If the player 1 is a bot that is supposed to make a move it does so in reset
         if isinstance(self.Game.Player1, BotPlayer):
             move = BotPlayer.make_random_move(self.Game.empty_spots)
-            self.Game.place_piece(self.CurrentPlayer, move[0], move[1])
+            valid_m, p1_reward, p2_reward = self.Game.place_piece(self.CurrentPlayer, move[0], move[1])
+            # p1_reward must be 0 by default, since we're resetting the env.
         elif isinstance(self.Game.Player1, HumanPlayer):
             raise NotImplemented
 
-        return self.Game.Board.Grid, 0, False, info_tag # return initial observation
+        return self.Game.Board.Grid, p1_reward, False, info_tag  # return initial observation
 
         # self.Game.Board.Grid.
 

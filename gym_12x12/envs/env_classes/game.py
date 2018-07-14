@@ -157,7 +157,6 @@ class Game:
 
         return [int_blue_score_tally, int_red_score_tally]
 
-
     def __is_piece_surrounded(self, at_row, at_col):
         """
         This private function determines if a game piece located at [row, col] is surrounded by an opposing piece

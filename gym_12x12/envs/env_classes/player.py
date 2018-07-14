@@ -91,15 +91,18 @@ class BotPlayer (Player):
 
         return list_of_strategies # Return a List
 
-    def make_random_move(self, empty_move_list):
+    def get_random_move(self, empty_move_list):
         """
         This function returns a random spot to play
         :empty_move_list: the cached list of available moves
         :return: [row,col]
         """
         if isinstance(empty_move_list, list):
-            choice = randint(0, len(empty_move_list))
-            return empty_move_list.pop(choice)
+            if len(empty_move_list) > 0:
+                choice = randint(0, len(empty_move_list))
+                return empty_move_list.pop(choice)
+            else:
+                return -1, -1  # Signifies that there are no empty moves left
 
     def make_strategic_move(self):
         pass
