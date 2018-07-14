@@ -101,7 +101,7 @@ class BotPlayer (Player):
             choice = randint(0, len(empty_move_list))
             return empty_move_list.pop(choice)
 
-    def make_strategic_move(self, empty_move_list):
+    def make_strategic_move(self):
         pass
 
     def will_move_endanger_player(self, move, board_ref):

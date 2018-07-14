@@ -81,7 +81,6 @@ class Game:
 
         if self.Board.Grid[yloc, xloc] == Game.EMPTY:  # Empty slot to play
             self.Board.Grid[yloc, xloc] = arg_player.piece_color
-            self.empty_spots.remove((yloc, xloc))
 
             # self.sweep_board()
             print("Reward check on Move # ", self.MoveNumber, self.reward_check(yloc, xloc))

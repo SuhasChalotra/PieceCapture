@@ -23,16 +23,52 @@ class gym12x12_env(gym.Env):
         :return:
         """
 
-        output = self.Game.place_piece(self.CurrentPlayer, action[0], action[1])
-        if output == Game.GAME_MOVE_VALID:
+        move_results = self.Game.place_piece(self.CurrentPlayer, action[0], action[1])
+        # The above MUST be agent's action and it must be Player1
+        # we need a variable that keeps track of the reward for this immediate action in order to subtract it
+        # later, depending on the BOT/Human move in response
+
+        done_flag = self.Game.is_game_complete()
+        info_tag = ""
+        if move_results == Game.GAME_MOVE_VALID:
             if self.CurrentPlayer == self.Game.Player1:
                 self.CurrentPlayer = self.Game.Player2
+
+                # The move is valid; we need to do some calc for rewards
+
+                if isinstance(self.CurrentPlayer, BotPlayer):
+                    # Bot Player, bot makes a move
+                    bot_move = BotPlayer.make_random_move(self.Game.empty_spots)
+                    self.Game.place_piece(self.CurrentPlayer, bot_move)
+
+                    # If the BOT scores, we need to do some calulation
+                    self.CurrentPlayer = self.Game.Player1
+
+                elif isinstance(self.CurrentPlayer, HumanPlayer):
+                    # Do something, but not implemented
+                    self.CurrentPlayer = self.Game.Player1
+                    raise NotImplemented
+                else:
+                    raise ValueError("Invalid Player.")
             else:
-                self.CurrentPlayer = self.Game.Player1
+                # This case should never evaluate to true, if so there is a problem w/ code:
+                raise ValueError("This case should never evaluate to true as Player1 must be agent. Check code.")
+        else:
+            # The AIPlayer should be negatively rewarded for an invalid move. We should do this in the return value
+            # of make_move
+            # The BotPlayer should make its move and return the updated board state
+            info_tag = "Agent penalized for making invalid move."
+            if self.CurrentPlayer == self.Game.Player1:
+                self.CurrentPlayer = self.Game.Player2
+                # The bot or human player must make a move in response here
+            else:
+                # This case should never evaluate to true, if so there is a problem w/ code:
+                raise ValueError("This case should never evaluate to true as Player1 must be agent. Check code.")
+            return self.Game.Board.Grid, -1, done_flag, info_tag
 
-        #Add a check for rewards
+        # Add a check for rewards
 
-        #Return observations, rewards, done, info
+        #  observations, rewards, done, info
 
     def render(self):
         self.Game.print_game_board()  # Prints the game board
@@ -48,14 +84,29 @@ class gym12x12_env(gym.Env):
         :return:
         """
 
-        self.Game.Board.clear()
-        self.CurrentPlayer = self.Game.Player1
+        #  We will make sure that all of the required elements of the game are not null.
+        #  Player objects must be propely instantiated, and
+        #  the game properly initiated using the initiate_game method
 
-        #If the player 1 is a bot that is supposed to make a move it does so in reset
-        if isinstance(BotPlayer, self.Game.Player1):
+        if self.Game is None or self.Game.Player1 is None or self.Game.Player2 is None:
+            raise ValueError("Game not propely initiated. (Games or Players)")
+
+        if self.action_space is None or self.observation_space is None:
+            raise ValueError("Game not propely initiated. Check action or observation spaces")
+
+        self.Game.Board.clear()
+        self.CurrentPlayer = self.Game.Player1  # Player 1 always starts
+
+        info_tag = "first_move"
+
+        # If the player 1 is a bot that is supposed to make a move it does so in reset
+        if isinstance(self.Game.Player1, BotPlayer):
             move = BotPlayer.make_random_move(self.Game.empty_spots)
-            self.Game.place_piece(self.CurrentPlayer,move[0], move[1])
-        return self.Game.Board.Grid
+            self.Game.place_piece(self.CurrentPlayer, move[0], move[1])
+        elif isinstance(self.Game.Player1, HumanPlayer):
+            raise NotImplemented
+
+        return self.Game.Board.Grid, 0, False, info_tag # return initial observation
 
         # self.Game.Board.Grid.
 
@@ -84,6 +135,11 @@ class gym12x12_env(gym.Env):
             return BotPlayer()
 
     def initiate_game(self, arg_player1, arg_player2, arg_int_boardsize):
+        if not isinstance(arg_player1, AgentPlayer):
+            raise ValueError("Player 1 must be an agent")
+
+        if isinstance(arg_player2, AgentPlayer):
+            raise ValueError("Player two must be a bot or a human. It cannot be an agent")
 
         self.Game = Game(arg_player1, arg_player2, rows=arg_int_boardsize, cols=arg_int_boardsize)
         self.CurrentPlayer = self.Player1
