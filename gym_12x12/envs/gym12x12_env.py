@@ -159,11 +159,12 @@ class gym12x12_env(gym.Env):
             return BotPlayer()
 
     def initiate_game(self, arg_player1, arg_player2, arg_int_boardsize):
-        if not isinstance(arg_player1, AgentPlayer):
-            raise ValueError("Player 1 must be an agent")
+        # When the game is initialized we
+        if not isinstance(arg_player1, Player):
+            raise ValueError("Player 1 must be a player")
 
-        if isinstance(arg_player2, AgentPlayer):
-            raise ValueError("Player two must be a bot or a human. It cannot be an agent")
+        if isinstance(arg_player2, Player):
+            raise ValueError("Player 2 must be a player")
 
         self.Game = Game(arg_player1, arg_player2, rows=arg_int_boardsize, cols=arg_int_boardsize)
         self.CurrentPlayer = self.Player1

@@ -9,6 +9,7 @@ class Game:
     RED_PIECE = 2
     BLUE_PIECE = 1
 
+
     def __init__(self, player_1, player_2, rows=12, cols=12):
         """
         Initializes a new game.
@@ -63,8 +64,9 @@ class Game:
         :return: int, int_p1_pointScored, int_p2_pointScored
         """
         # yloc and xloc need to be within range and be valid integers
-        blue_reward = -1
+        blue_reward = 0
         red_reward = 0
+
 
         if not isinstance(yloc, int):
             print("y location must be an integer")
@@ -99,31 +101,6 @@ class Game:
         # This prints the game board contents
         print(self.Board.Grid)
 
-    def sweep_board(self):
-        """
-        This scans the game board spot-by-spot and tallies the scores for blue and red.
-        :return: void.
-        """
-        int_blue_score_tally = 0
-        int_red_score_tally = 0
-
-        # As a test, let's iterate through entire board
-        for r_rows in range(0, len(self.Board.Grid)):
-            for c_cols in range(0, self.Board.COL_COUNT):
-                if self.Board.Grid[r_rows, c_cols] == Game.EMPTY:
-                    continue  # go to next iteration
-                if self.Board.Grid[r_rows, c_cols] == Game.BLUE_PIECE:
-                    if self.piece_surrounded_alt(r_rows, c_cols):
-                        print("Red scores a point",r_rows,c_cols)
-                        int_red_score_tally += 1
-                elif self.Board.Grid[r_rows, c_cols] == Game.RED_PIECE:
-                    if self.piece_surrounded_alt(r_rows, c_cols):
-                        print("Blue scores a point",r_rows,c_cols)
-                        int_blue_score_tally += 1
-
-        # calc the final score count
-        self.PlayerOneScore = int_blue_score_tally
-        self.PlayerTwoScore = int_red_score_tally
 
     def reward_check(self, row, col):
         """
@@ -133,17 +110,17 @@ class Game:
         :param col:
         :return:
         """
-        int_blue_score_tally = 0
-        int_red_score_tally = 0
+        int_blue_reward_tally = 0
+        int_red_reward_tally = 0
 
         surrounding_pieces = self.get_surrounding_pieces(row, col)
 
         # First check if current piece is surrounded
         if self.piece_surrounded_alt(row, col, adjacent_pieces=surrounding_pieces):
             if self.Board.Grid[row, col] == Game.BLUE_PIECE:
-                int_red_score_tally += 1
+                int_red_reward_tally += 1
             elif self.Board.Grid[row, col] == Game.RED_PIECE:
-                int_blue_score_tally += 1
+                int_blue_reward_tally += 1
 
         # Now we check the adjacent pieces to see if they got surrounded
         for piece in surrounding_pieces:
@@ -151,11 +128,13 @@ class Game:
                 continue
             elif self.piece_surrounded_alt(piece[0], piece[1]):
                 if self.Board.Grid[piece[0], piece[1]] == Game.BLUE_PIECE:
-                    int_red_score_tally += 1
+                    int_red_reward_tally += 1
+                    self.PlayerTwoScore += 1
                 elif self.Board.Grid[piece[0], piece[1]] == Game.RED_PIECE:
-                    int_blue_score_tally += 1
+                    int_blue_reward_tally += 1
+                    self.PlayerOneScore += 1
 
-        return [int_blue_score_tally, int_red_score_tally]
+        return [int_blue_reward_tally, int_red_reward_tally]
 
     def __is_piece_surrounded(self, at_row, at_col):
         """
