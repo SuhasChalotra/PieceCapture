@@ -9,6 +9,7 @@ class Game:
     RED_PIECE = 2
     BLUE_PIECE = 1
     POINT_REWARD = 10
+    INVALID_MOVE_PENALIZATION = -1
 
     def __init__(self, player_1, player_2, rows=12, cols=12):
         """
@@ -64,9 +65,12 @@ class Game:
         :return: int, int_p1_pointScored, int_p2_pointScored
         """
         # yloc and xloc need to be within range and be valid integers
-        blue_reward = 0
-        red_reward = 0
-
+        if arg_player.piece_color == Game.BLUE_PIECE:
+            blue_reward = Game.INVALID_MOVE_PENALIZATION
+            red_reward = 0
+        elif arg_player.piece_color == Game.RED_PIECE:
+            red_reward = Game.INVALID_MOVE_PENALIZATION
+            blue_reward = 0
 
         if not isinstance(yloc, int):
             print("y location must be an integer")
@@ -90,7 +94,7 @@ class Game:
             # self.sweep_board()
             print("Reward check on Move # ", self.MoveNumber, self.reward_check(yloc, xloc))
             reward_results = self.reward_check(yloc, xloc)
-            self.MoveNumber += 1  # Increment
+            self.MoveNumber += 1  # Increment the score
             self.empty_spots.remove((yloc, xloc))
             return Game.GAME_MOVE_VALID,  reward_results[0], reward_results[1]
 
@@ -101,7 +105,6 @@ class Game:
     def print_game_board(self):
         # This prints the game board contents
         print(self.Board.Grid)
-
 
     def reward_check(self, row, col):
         """

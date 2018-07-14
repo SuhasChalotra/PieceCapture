@@ -20,77 +20,31 @@ class gym12x12_env(gym.Env):
         This complies with the gym interface: Placing a tile on the board and alternates the current player
         :param action: a tuple  which contains the player's row_move, col_move -ie. where they will
          place the tile on the board(y, x)
-        :return:
+        :return: observation, reward, done, info
         """
         agent_master_reward_tally = 0
+
+        # Agent makes a play. move_results results in true or false
         move_results, p1_reward, p2_reward = self.Game.place_piece(self.CurrentPlayer, action[0], action[1])
-        # The above MUST be an agent's action and it must be Player1
-        # we need a variable that keeps track of the reward for this immediate action in order to subtract it
-        # later, depending on the BOT/Human move in response
-
         agent_master_reward_tally += p1_reward - p2_reward
-
-        # Declare a done flag and info tag
         done_flag = self.Game.is_game_complete()
-        info_tag = ""
-        if done_flag:
-            # The game is done
-            info_tag = "Game done."
-            return self.Game.Board.Grid, agent_master_reward_tally, done_flag, info_tag
+        return_dict = []
 
-        if move_results == Game.GAME_MOVE_VALID:
-            if self.CurrentPlayer == self.Game.Player1:
-                self.CurrentPlayer = self.Game.Player2
+        if not move_results:
+            # We must abort the step function and return the reward_tally (which should be negative)
+            return self.Game.Board.Grid, agent_master_reward_tally, done_flag, return_dict
 
-                # The move is valid; we need to do some calc for rewards
+        self.alternate_player()  # switch players
 
-                if isinstance(self.CurrentPlayer, BotPlayer):
-                    # Bot Player, bot makes a move
-                    bot_move = BotPlayer.get_random_move(self.Game.empty_spots)
+        # Make a non-agent move
+        if not done_flag:
+            ob_grid, p1r, p2r = self.make_non_agent_move()
+            # Calculate reward
+            agent_master_reward_tally += p1r - p2r
+            done_flag = self.Game.is_game_complete()
 
-                    if bot_move[0] >= 0:
-                        v, p1_r, p2_r = self.Game.place_piece(self.CurrentPlayer, bot_move)
-                        agent_master_reward_tally += p1_r - p2_r  # Keep track of reward tally
-
-                        self.CurrentPlayer = self.Game.Player1
-                    else:
-                        # No moves left. Game appears to be over
-                        done_flag = True
-
-                elif isinstance(self.CurrentPlayer, HumanPlayer):
-                    # Do something, but not implemented
-                    self.CurrentPlayer = self.Game.Player1
-                    raise NotImplemented
-                else:
-                    raise ValueError("Invalid Player.")
-            else:
-                # This case should never evaluate to true, if so there is a problem w/ code:
-                raise ValueError("This case should never evaluate to true as Player1 must be agent. Check code.")
-        else:
-            # The AIPlayer should be negatively rewarded for an invalid move. We should do this in the return value
-            # of make_move
-            # The BotPlayer should make its move and return the updated board state
-            info_tag = "Agent penalized for making invalid move."
-            if self.CurrentPlayer == self.Game.Player1:
-                self.CurrentPlayer = self.Game.Player2
-                # The bot or human player must make a move in response here
-                # Bot Player, bot makes a move
-                bot_move = BotPlayer.get_random_move(self.Game.empty_spots)
-                if bot_move[0] > 0:
-                    v, p1_r, p2_r = self.Game.place_piece(self.CurrentPlayer, bot_move)
-                    agent_master_reward_tally += p1_r - p2_r  # Keep track of reward tally
-                else:
-                    # Game appears to be finished as Bot has no more moves to make
-                    done_flag = True
-            else:
-                # This case should never evaluate to true, if so there is a problem w/ code:
-                raise ValueError("This case should never evaluate to true as Player1 must be agent. Check code.")
-
-        done_flag = self.Game.is_game_complete()
-        return self.Game.Board.Grid, agent_master_reward_tally, done_flag, info_tag
-
-        # Add a check for rewards
-
+        self.alternate_player()  # again, we alternate the player
+        return self.Game.Board.Grid, agent_master_reward_tally, done_flag, return_dict
         #  observations, rewards, done, info
 
     def render(self):
@@ -98,15 +52,8 @@ class gym12x12_env(gym.Env):
 
     def reset(self):
         """
-        self, argPlayer1, argPlayer2, size_rows=12, size_cols=12
-        Resets the fields. Defaults the current player to Player1
-        :param argPlayer1: Player1
-        :param argPlayer2: Player2
-        :param size_rows: x size of game board (default = 12)
-        :param size_cols: y size of game board (default = 12)
-        :return:
+        :return: returns an initial observation
         """
-
         #  We will make sure that all of the required elements of the game are not null.
         #  Player objects must be propely instantiated, and
         #  the game properly initiated using the initiate_game method
@@ -120,19 +67,17 @@ class gym12x12_env(gym.Env):
         self.Game.Board.clear()
         self.CurrentPlayer = self.Game.Player1  # Player 1 always starts
 
-        info_tag = "first_move"
+        # If the current player (player1) is not Agent, then we call our make non-agent move function and
+        # get an initial observation with the non-agent move
+        if not isinstance(self.CurrentPlayer, AgentPlayer):
+            # Call our make_non_agent_move method
+            init_observation, p1r, p2r = self.make_non_agent_move()
+            # Return an initial observation based on this move
+            return init_observation
 
-        # If the player 1 is a bot that is supposed to make a move it does so in reset
-        if isinstance(self.Game.Player1, BotPlayer):
-            move = BotPlayer.make_random_move(self.Game.empty_spots)
-            valid_m, p1_reward, p2_reward = self.Game.place_piece(self.CurrentPlayer, move[0], move[1])
-            # p1_reward must be 0 by default, since we're resetting the env.
-        elif isinstance(self.Game.Player1, HumanPlayer):
-            raise NotImplemented
-
-        return self.Game.Board.Grid, p1_reward, False, info_tag  # return initial observation
-
-        # self.Game.Board.Grid.
+        else:
+            # Essentially returning an empty board (and initial observation)
+            return self.Game.Board.Grid
 
     def close(self):
         pass
@@ -142,10 +87,22 @@ class gym12x12_env(gym.Env):
 
     def make_non_agent_move(self):
         """
-        :return: board
+        :return: observation and reward
         """
+        if isinstance(self.CurrentPlayer, BotPlayer):
+            # Check if it's bot
+            move = BotPlayer.make_random_move(self.Game.empty_spots)
+            valid_m, p1_reward, p2_reward = self.Game.place_piece(self.CurrentPlayer, move[0], move[1])
+            # self.alternate_player()
 
+            # We need to return an obs and reward
+            return self.Game.Board.Grid, p1_reward, p2_reward
 
+        elif isinstance(self.CurrentPlayer, HumanPlayer):
+            # go in some input loop ensuring the Human player's input is valid
+            # self.alternate_player()
+
+            pass
 
     @staticmethod
     def create_player(player_type):
@@ -164,6 +121,12 @@ class gym12x12_env(gym.Env):
         elif player_type == PLAYERTYPE_BOT:
 
             return BotPlayer()
+
+    def alternate_player(self):
+        if self.CurrentPlayer == self.Game.Player1:
+            self.CurrentPlayer = self.Game.Player2
+        else:
+            self.CurrentPlayer = self.Game.Player1
 
     def initiate_game(self, arg_player1, arg_player2, arg_int_boardsize):
         # When the game is initialized we
