@@ -140,6 +140,13 @@ class gym12x12_env(gym.Env):
     def seed(self, seed=None):
         pass
 
+    def make_non_agent_move(self):
+        """
+        :return: board
+        """
+
+
+
     @staticmethod
     def create_player(player_type):
         """
