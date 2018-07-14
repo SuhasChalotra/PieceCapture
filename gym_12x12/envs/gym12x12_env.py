@@ -23,7 +23,7 @@ class gym12x12_env(gym.Env):
         :return:
         """
 
-        move_results = self.Game.place_piece(self.CurrentPlayer, action[0], action[1])
+        move_results, p1_reward, p2_reward = self.Game.place_piece(self.CurrentPlayer, action[0], action[1])
         # The above MUST be agent's action and it must be Player1
         # we need a variable that keeps track of the reward for this immediate action in order to subtract it
         # later, depending on the BOT/Human move in response

@@ -1,5 +1,5 @@
 from gym_12x12.envs.env_classes.gameboard import GameBoard as gb
-from gym_12x12.envs.env_classes.player import Player
+from gym_12x12.envs.env_classes.player import Player, AgentPlayer, BotPlayer
 
 
 class Game:
@@ -42,7 +42,7 @@ class Game:
         self.MoveNumber = 0
         self.empty_spots = []
 
-        #Populate the empty spots list
+        # Populate the empty spots list
         for x in range(rows):
             for y in range(cols):
                 self.empty_spots.append((x, y))
@@ -58,45 +58,42 @@ class Game:
         """
         This will place a player's piece in the game_board matrix
         :param arg_player: the player making the move
-        :param yloc: Y-axis
-        :param xloc: X-axis
-        :return: int. Either Game move is VALID or INVALID
+        :param yloc: Rows (vertical)
+        :param xloc: Columns (horizontal)
+        :return: int, int_p1_pointScored, int_p2_pointScored
         """
         # yloc and xloc need to be within range and be valid integers
+        blue_reward = -1
+        red_reward = 0
+
         if not isinstance(yloc, int):
             print("y location must be an integer")
-            return Game.GAME_MOVE_INVALID
+            return Game.GAME_MOVE_INVALID, blue_reward, red_reward
 
         if not isinstance(xloc, int):
             print("x location must be an integer")
-            return Game.GAME_MOVE_INVALID
+            return Game.GAME_MOVE_INVALID, blue_reward, red_reward
 
         if xloc < 0 or xloc > self.Board.COL_COUNT - 1:
             print("x is out of range. x=", xloc)
-            return Game.GAME_MOVE_INVALID
+            return Game.GAME_MOVE_INVALID, blue_reward, red_reward
 
         if yloc < 0 or yloc > self.Board.ROW_COUNT - 1:
             print("y is out of range. y=", yloc)
-            return Game.GAME_MOVE_INVALID
+            return Game.GAME_MOVE_INVALID, blue_reward, red_reward
 
         if self.Board.Grid[yloc, xloc] == Game.EMPTY:  # Empty slot to play
             self.Board.Grid[yloc, xloc] = arg_player.piece_color
 
             # self.sweep_board()
             print("Reward check on Move # ", self.MoveNumber, self.reward_check(yloc, xloc))
+            reward_results = self.reward_check(yloc, xloc)
             self.MoveNumber += 1  # Increment
-            return Game.GAME_MOVE_VALID
+            return Game.GAME_MOVE_VALID,  reward_results[0], reward_results[1]
 
         else:
-            """ The attempting player should be allowed to play another move until the move entered is valid.
-            We'll return a value to indicate to the calling code
-            that the game move is invalid, and that the player should try again.
-            This will only ever happen with human players. The AI can never attempt to play a piece
-            in a slot that is occupied, as it will check before doing so. It also can never
-            play an invalid move (ex. index out of range)
-            """
             print("Invalid move. Try again.")
-            return Game.GAME_MOVE_INVALID
+            return Game.GAME_MOVE_INVALID, blue_reward, red_reward
 
     def print_game_board(self):
         # This prints the game board contents
