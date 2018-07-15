@@ -179,7 +179,7 @@ class Strategy:
         # print("length of surrounding tiles =", len(self.surrounding_tiles))
         # print("surrounding tiles index 0 is", self.surrounding_tiles[0])
         self.possible_moves = self.get_possible_moves(arg_game_board_reference, diagonals=False)
-        self.possible_moves_diagonal = self.possible_moves_diagonal(arg_game_board_reference, diagonals=True)
+        self.possible_moves_diagonal = self.get_possible_moves(arg_game_board_reference, diagonals=True)
 
     @staticmethod
     def get_point_scoring_strategies(arg_raw_list, AIPiece):
