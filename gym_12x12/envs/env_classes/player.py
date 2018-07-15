@@ -125,7 +125,8 @@ class BotPlayer (Player):
                 raise ValueError("Unable to evaluate, as the move in question is not on an empty space.")
 
             s_pieces = board_ref.get_surrounding_pieces(r, c, diagonals=False)
-            if board_ref.get_count_of(opp_color, s_pieces) == len(s_pieces) - 1 and board_ref.get_count_of(0, s_pieces) == 1:
+            if board_ref.get_count_of(opp_color, s_pieces) == len(s_pieces) - 1 and \
+            board_ref.get_count_of(0, s_pieces) == 1:
                 return True
 
             if board_ref.get_count_of(opp_color, s_pieces) == len(s_pieces):
@@ -146,9 +147,10 @@ class Strategy:
     """
 
     def __init__(self, arg_game_board_reference, arg_center):
-        # self.Game = arg_game_reference  # This basically holds a reference to the current gameboard
+
         self.center = arg_center
         row, col = arg_center  # extract from the tuple
+        self.piece_color_at_center = arg_game_board_reference.Grid[row, col]
         self.surrounding_tiles = arg_game_board_reference.get_surrounding_pieces(row, col, diagonals=False)
         self.surrounding_tiles_diagonal = arg_game_board_reference.get_surrounding_pieces(row, col, diagonals=True)
 
@@ -167,17 +169,17 @@ class Strategy:
         # Blocking properties
         self.is_block_opportunity = False
         self.block_priority_level = 0
-        self.block_defender = 0  # should be 1 or 2 indicating the player, or 0 for no player (default)
+        self.block_defender_player = 0  # should be 1 or 2 indicating the player, or 0 for no player (default)
+
+        self.white_space_block_opportunity = False
+        self.white_space_block_priority = 0
 
         # Calculate possible plays
         # print("strategy centered on", self.center)
         # print("length of surrounding tiles =", len(self.surrounding_tiles))
         # print("surrounding tiles index 0 is", self.surrounding_tiles[0])
-        for piece in range(0, len(self.surrounding_tiles)):
-            r, c = self.surrounding_tiles[piece]
-            if arg_game_board_reference.Grid[r, c] == 0:  # Only add a possible play if the [r,c] is empty (0)
-                self.possible_moves.append([r, c])
-
+        self.possible_moves = self.get_possible_moves(arg_game_board_reference, diagonals=False)
+        self.possible_moves_diagonal = self.possible_moves_diagonal(arg_game_board_reference, diagonals=True)
 
     @staticmethod
     def get_point_scoring_strategies(arg_raw_list, AIPiece):
