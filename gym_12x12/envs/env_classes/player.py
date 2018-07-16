@@ -188,12 +188,12 @@ class Strategy:
 
     def get_possible_moves(self, boardstate, diagonals=False):
         """
-        :param argSurrounding_Pieces: the surrounding pieces
+        :param diagonals: if true, func returns surrounding pieces on diagonals only.
         :param boardstate: reference to the gameboard
         :return:
         """
         return_list = []
-        if diagonals == False:
+        if diagonals:
             for index in range(0, len(self.surrounding_tiles)):
                 r, c = self.surrounding_tiles[index]
                 if boardstate.Grid[r, c] == 0:

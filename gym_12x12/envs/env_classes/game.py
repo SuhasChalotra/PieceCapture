@@ -188,7 +188,8 @@ class Game:
         :param col:
         :return:
         """
-        output = [[row-1,col],[row+1,col],[row,col+1],[row,col-1]] # These are the top, bottom, right and left pieces
+        # These are the top, bottom, right and left pieces
+        output = [[row-1, col], [row+1, col], [row, col+1], [row, col-1]]
         row_checker = 0
 
         if row == 0:
