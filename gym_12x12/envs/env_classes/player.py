@@ -206,3 +206,20 @@ class Strategy:
                     return_list.append(self.surrounding_tiles_diagonal[index])
 
         return return_list
+
+    @staticmethod
+    def contains_count_of(arg_list_of, target, arg_boardstate):
+        """
+        This static method returns the count of
+        :param arg_list_of: an array of y,x co-ords
+        :param arg_boardstate: refernce to the current gameboard state
+        :param target: the piece color we are querying
+        :return:
+        """
+        count = 0
+        for index in range(0, len(arg_list_of)):
+            row, col = arg_list_of[index]
+            if arg_boardstate.Grid[row, col] == target:
+                count += 1
+
+        return count
