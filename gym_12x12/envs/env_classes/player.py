@@ -68,28 +68,20 @@ class BotPlayer (Player):
         self.name = "Bot_Player"
         pass
 
-    def get_strategies(self, arg_game_board_reference):
+    def do_ai_move(self, arg_game_board_reference):
         """
         :param arg_game_board_reference: the current state of the game board
         :return: should return [row, col] indicating where to play next
         """
-        if isinstance(arg_game_board_reference, GameBoard):
-            list_of_strategies = []  # Blank List of all possible strategies centered around a  at [rows, cols]
+        # this is the master list of all strategies from which we can pull out different sub-strategies
+        # and boardstate assessments
+        master_list = Strategy.get_all_strategies(arg_game_board_reference, self.piece_color)
 
-            for rows in range(0, len(arg_game_board_reference.Grid)):
-                for cols in range(0, arg_game_board_reference.COL_COUNT):
-                    s = Strategy(arg_game_board_reference, [rows, cols])
-                    list_of_strategies.append(s)  # Add the strategy to our list of strategies
+        # Create a sub-list of strategies which will cause the AI to win on the next move
 
-            print("Total number of list_of_strategies", len(list_of_strategies))
+        # Create a sub-list of strategies where AI must block its opponent from scoring
 
-            # Create a sub-list of strategies which will cause the AI to win on the next move
-
-            # Create a sub-list of strategies where AI must block its opponent from scoring
-
-            # Create a sub-list of strategies that allow the AI to play moves that will lead it to a score a point
-
-        return list_of_strategies # Return a List
+        # Create a sub-list of strategies that allow the AI to play moves that will lead it to a score a point
 
     def get_random_move(self, empty_move_list):
         """
@@ -146,7 +138,7 @@ class Strategy:
     surrounding_tiles = []  # this should be a list of x,y co-ordinates (max 4, min 2) of tiles that surround the center
     """
 
-    def __init__(self, arg_game_board_reference, arg_center):
+    def __init__(self, arg_game_board_reference, arg_center, arg_in_piece):
 
         self.center = arg_center
         row, col = arg_center  # extract from the tuple
@@ -171,8 +163,12 @@ class Strategy:
         self.block_priority_level = 0
         self.block_defender_player = 0  # should be 1 or 2 indicating the player, or 0 for no player (default)
 
-        self.white_space_block_opportunity = False
+        self.is_white_space_block_opportunity = False
         self.white_space_block_priority = 0
+
+        # Piece identification
+        self.in_piece = arg_in_piece # Own piece
+        self.out_piece = Strategy.get_opp_color(self.in_piece)
 
         # Calculate possible plays
         # print("strategy centered on", self.center)
@@ -180,6 +176,31 @@ class Strategy:
         # print("surrounding tiles index 0 is", self.surrounding_tiles[0])
         self.possible_moves = self.get_possible_moves(arg_game_board_reference, diagonals=False)
         self.possible_moves_diagonal = self.get_possible_moves(arg_game_board_reference, diagonals=True)
+
+        # Determine white-space blocking status
+        self.white_space_block_priority = self.determine_whitespace_block(arg_game_board_reference)
+
+    @staticmethod
+    def get_all_strategies(arg_game_board_reference, home_piece):
+        """
+        Returns a list of all strategies for a board state
+        :param arg_game_board_reference: current board state
+        :param home_piece: the piece color of the player (AI) getting the list of all strategies
+        :return: list [] of all strategies
+        """
+        list_of_strategies = []  # Blank List of all possible strategies centered around a  at [rows, cols]
+
+        if isinstance(arg_game_board_reference, GameBoard):
+            for rows in range(0, len(arg_game_board_reference.Grid)):
+                for cols in range(0, arg_game_board_reference.COL_COUNT):
+                    s = Strategy(arg_game_board_reference, [rows, cols], home_piece)
+                    list_of_strategies.append(s)  # Add the strategy to our list of strategies
+
+            print("Total number of list_of_strategies", len(list_of_strategies))
+        else:
+            raise ValueError("Invalid gameboard state")
+
+        return list_of_strategies
 
     @staticmethod
     def get_point_scoring_strategies(arg_raw_list, AIPiece):
@@ -223,3 +244,69 @@ class Strategy:
                 count += 1
 
         return count
+
+    def determine_whitespace_block(self, arg_boardstate):
+        """
+        :param arg_boardstate: reference to the gameboard
+        :return: integer representing the strategy priority -0 to 4 (4 being highest priority)
+        """
+        r_value = 0
+        if self.piece_color_at_center == 0:
+            if self.contains_count_of(self.surrounding_tiles, 0, arg_boardstate) > 0 and \
+             self.contains_count_of(self.surrounding_tiles, self.in_piece, arg_boardstate) == 0:
+                if self.contains_count_of(self.surrounding_tiles, self.out_piece, arg_boardstate) > 0:
+                    r_value = 6 - len(self.possible_moves) - \
+                     self.contains_count_of(self.possible_moves, 0, arg_boardstate)
+                    self.is_white_space_block_opportunity = True
+                    print("Debug: Saw white space block opportunity at ", self.center)
+
+        return r_value
+
+    def determine_point_block(self, arg_boardstate):
+        """
+        This determines whether the piece at center (one's own piece) is in the process of being surrounded, and
+        determines a move that will block the opponent from scoring
+        4 - Top priority - as in one move left until opponent scores
+        3 - Two spots to score
+        2 - Three spots to score
+        1 - Four spots to score
+        :param arg_boardstate:
+        :return: void
+        """
+        aggressor = 0  # keep track of person who is trying to score
+        row, col = self.center
+        target_color_at_center = arg_boardstate.Grid[row, col]
+
+        if not target_color_at_center == 0:
+            aggressor = self.get_opp_color(target_color_at_center)
+        else:
+            # write it off
+            self.is_block_opportunity = False
+            self.block_priority_level = 0
+            return
+
+        # Evaluate the surrounding tiles
+        if self.contains_count_of(self.surrounding_tiles, target_color_at_center, arg_boardstate) > 0 :
+            # Abort as the defender has blocked the aggressor
+            self.is_block_opportunity = False
+            self.block_priority_level = 0
+            return
+        else:
+            if self.contains_count_of(self.surrounding_tiles, 0, arg_boardstate) > 0:
+                # Surrounding piece contains and empty space and not one of the defender's pieces
+                self.is_block_opportunity = True
+                self.block_defender_player = target_color_at_center
+                self.block_priority_level = 5 - self.contains_count_of(self.surrounding_tiles, 0, arg_boardstate)
+
+    @staticmethod
+    def get_opp_color(arg_in_color):
+        """
+
+        :return: the opposite piece color to the player
+        """
+        if arg_in_color == 1:
+            return 2
+        elif arg_in_color == 2:
+            return 1
+        else:
+            raise ValueError("Invalid piece color.")
