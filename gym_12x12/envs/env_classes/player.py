@@ -76,6 +76,7 @@ class BotPlayer (Player):
         # this is the master list of all strategies from which we can pull out different sub-strategies
         # and boardstate assessments
         master_list = Strategy.get_all_strategies(arg_game_board_reference, self.piece_color)
+        print(master_list)
 
         # Create a sub-list of strategies which will cause the AI to win on the next move
 
@@ -179,6 +180,7 @@ class Strategy:
 
         # Determine white-space blocking status
         self.white_space_block_priority = self.determine_whitespace_block(arg_game_board_reference)
+        self.determine_point_block(arg_game_board_reference)
 
     @staticmethod
     def get_all_strategies(arg_game_board_reference, home_piece):
@@ -214,7 +216,7 @@ class Strategy:
         :return:
         """
         return_list = []
-        if diagonals:
+        if not diagonals:
             for index in range(0, len(self.surrounding_tiles)):
                 r, c = self.surrounding_tiles[index]
                 if boardstate.Grid[r, c] == 0:
@@ -258,7 +260,6 @@ class Strategy:
                     r_value = 6 - len(self.possible_moves) - \
                      self.contains_count_of(self.possible_moves, 0, arg_boardstate)
                     self.is_white_space_block_opportunity = True
-                    print("Debug: Saw white space block opportunity at ", self.center)
 
         return r_value
 
@@ -286,7 +287,7 @@ class Strategy:
             return
 
         # Evaluate the surrounding tiles
-        if self.contains_count_of(self.surrounding_tiles, target_color_at_center, arg_boardstate) > 0 :
+        if self.contains_count_of(self.surrounding_tiles, target_color_at_center, arg_boardstate) > 0:
             # Abort as the defender has blocked the aggressor
             self.is_block_opportunity = False
             self.block_priority_level = 0
@@ -295,6 +296,7 @@ class Strategy:
             if self.contains_count_of(self.surrounding_tiles, 0, arg_boardstate) > 0:
                 # Surrounding piece contains and empty space and not one of the defender's pieces
                 self.is_block_opportunity = True
+                print('Blocking status is true centered around', self.center)
                 self.block_defender_player = target_color_at_center
                 self.block_priority_level = 5 - self.contains_count_of(self.surrounding_tiles, 0, arg_boardstate)
 
