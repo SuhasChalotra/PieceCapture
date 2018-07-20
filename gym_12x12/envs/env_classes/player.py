@@ -66,7 +66,7 @@ class BotPlayer (Player):
     """
     def __init__(self):
         self.name = "Bot_Player"
-        pass
+        self.enable_white_space_strategy = True  # for use in the bot AI logic
 
     def do_ai_move(self, arg_game_board_reference):
         """
@@ -136,7 +136,8 @@ class Strategy:
     priority_level = 0  # holds the strategy priority level
     center = ()  # a strategy centers around a center tile of which we get the surrounding tiles, it will be a tuple
     possible_plays = []  # this should be a list of x,y for possible plays in this strategy
-    surrounding_tiles = []  # this should be a list of x,y co-ordinates (max 4, min 2) of tiles that surround the center
+    surrounding_tiles = []  # this should be a list of [y,x] co-ordinates (max 4, min 2) of tiles that surround the
+    center
     """
 
     def __init__(self, arg_game_board_reference, arg_center, arg_in_piece):
@@ -204,11 +205,6 @@ class Strategy:
 
         return list_of_strategies
 
-    @staticmethod
-    def get_point_scoring_strategies(arg_raw_list, AIPiece):
-        # go through the raw list and only
-        pass
-
     def get_possible_moves(self, boardstate, diagonals=False):
         """
         :param diagonals: if true, func returns surrounding pieces on diagonals only.
@@ -230,27 +226,11 @@ class Strategy:
 
         return return_list
 
-    @staticmethod
-    def contains_count_of(arg_list_of, target, arg_boardstate):
-        """
-        This static method returns the count of
-        :param arg_list_of: an array of y,x co-ords
-        :param arg_boardstate: refernce to the current gameboard state
-        :param target: the piece color we are querying
-        :return:
-        """
-        count = 0
-        for index in range(0, len(arg_list_of)):
-            row, col = arg_list_of[index]
-            if arg_boardstate.Grid[row, col] == target:
-                count += 1
-
-        return count
 
     def determine_whitespace_block(self, arg_boardstate):
         """
         :param arg_boardstate: reference to the gameboard
-        :return: integer representing the strategy priority -0 to 4 (4 being highest priority)
+        :return: integer representing the strategy priority: 0 to 4 (4 being highest priority)
         """
         r_value = 0
         if self.piece_color_at_center == 0:
@@ -275,13 +255,14 @@ class Strategy:
         :return: void
         """
         aggressor = 0  # keep track of person who is trying to score
-        row, col = self.center
-        target_color_at_center = arg_boardstate.Grid[row, col]
+        row, col = self.center  # extract row, col
+        target_color_at_center = arg_boardstate.Grid[row, col] #  Get the piece color a the center (target)
 
         if not target_color_at_center == 0:
+            #  if the piece color at center isn't 'empty', then we can get the opposite color (1 -> 2, 2 -> 1)
             aggressor = self.get_opp_color(target_color_at_center)
         else:
-            # write it off
+            # write it off as not an opportunity
             self.is_block_opportunity = False
             self.block_priority_level = 0
             return
@@ -299,6 +280,63 @@ class Strategy:
                 print('Blocking status is true centered around', self.center)
                 self.block_defender_player = target_color_at_center
                 self.block_priority_level = 5 - self.contains_count_of(self.surrounding_tiles, 0, arg_boardstate)
+
+    def determine_point_score(self, arg_boardstate):
+        """
+        This will populate the object properties scoring_player and scoring_move
+        :param arg_boardstate:
+        :return: void
+        """
+        row, col = self.center  # extract the [y,x] of the center
+        opponent_color_at_center = self.get_opp_color(arg_boardstate.Grid[row, col])
+        if not arg_boardstate.Grid[row, col] == 0:  # if not empty
+            if self.contains_count_of(self.surrounding_tiles, opponent_color_at_center, arg_boardstate) == \
+             len(self.surrounding_tiles - 1):
+
+    @staticmethod
+    def contains_count_of(arg_list_of, target, arg_boardstate):
+        """
+        This static method returns the count of target within a given set arg_list_of
+        :param arg_list_of: an array of y,x co-ords
+        :param arg_boardstate: refernce to the current gameboard state
+        :param target: the piece color we are querying
+        :return:
+        """
+        count = 0
+        for index in range(0, len(arg_list_of)):
+            row, col = arg_list_of[index]
+            if arg_boardstate.Grid[row, col] == target:
+                count += 1
+
+        return count
+
+    @staticmethod
+    def get_tuples_containing(arg_list_of, target, arg_boardstate):
+        """
+        This will return a list of [row, col] where piece color 'target' is found on the game board corresponding
+        to [row, col] found in arg_list_of
+        :param arg_list_of: a list[] of tuples [row, col]
+        :param target: piece color (0, 1 or 2)
+        :param arg_boardstate: reference to the current state of the gameboard
+        :return: a list of tuples whose coordinates correspond to 'target' on the game board
+        """
+        # Validation
+        if not isinstance(arg_list_of, list):
+            raise ValueError("Invalid argument: argument 'arg_list_of' is not of type 'list' or 'tuple")
+
+        if not isinstance(target, int):
+            raise ValueError("Invalid argument: argument 'target' is not of type 'int'")
+
+        if not isinstance(arg_boardstate, GameBoard):
+            raise ValueError("Invalid argument: argument 'arg_boardstate is not of type 'Gameboard'")
+
+        # This will be our return value
+        return_list = []
+        for item in arg_list_of:
+            row, col = item
+            if arg_boardstate.Grid[row, col] == target:
+                return_list.append(item)
+
 
     @staticmethod
     def get_opp_color(arg_in_color):
