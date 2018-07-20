@@ -78,8 +78,12 @@ class BotPlayer (Player):
         :param arg_game_board_reference: the current state of the game board
         :return: should return [row, col] indicating where to play next
         """
+
+        # Let's first determine if this AI Bot instance has the dumb_bot_logic flag turned on (true)
+        # which means it will pick a random move, instead of process the smart AI logic
         if self.dumb_bot_logic:
-            return self.get_random_move()
+            return self.get_random_move(arg_game_board_reference.empty_spots)
+
         # this is the master list of all strategies from which we can pull out different sub-strategies
         # and boardstate assessments
         master_list = Strategy.get_all_strategies(arg_game_board_reference, self.piece_color)
