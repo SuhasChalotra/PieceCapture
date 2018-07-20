@@ -181,7 +181,12 @@ class Strategy:
 
         # Determine white-space blocking status
         self.white_space_block_priority = self.determine_whitespace_block(arg_game_board_reference)
+
+        # Determine blocking
         self.determine_point_block(arg_game_board_reference)
+
+        # Determine if there is a scoring opportunity on next move
+        self.determine_point_scoring_move(arg_game_board_reference)
 
     @staticmethod
     def get_all_strategies(arg_game_board_reference, home_piece):
@@ -226,7 +231,6 @@ class Strategy:
 
         return return_list
 
-
     def determine_whitespace_block(self, arg_boardstate):
         """
         :param arg_boardstate: reference to the gameboard
@@ -256,7 +260,7 @@ class Strategy:
         """
         aggressor = 0  # keep track of person who is trying to score
         row, col = self.center  # extract row, col
-        target_color_at_center = arg_boardstate.Grid[row, col] #  Get the piece color a the center (target)
+        target_color_at_center = arg_boardstate.Grid[row, col]  # Get the piece color a the center (target)
 
         if not target_color_at_center == 0:
             #  if the piece color at center isn't 'empty', then we can get the opposite color (1 -> 2, 2 -> 1)
@@ -281,17 +285,57 @@ class Strategy:
                 self.block_defender_player = target_color_at_center
                 self.block_priority_level = 5 - self.contains_count_of(self.surrounding_tiles, 0, arg_boardstate)
 
-    def determine_point_score(self, arg_boardstate):
+    def determine_point_scoring_move(self, arg_boardstate):
         """
         This will populate the object properties scoring_player and scoring_move
         :param arg_boardstate:
         :return: void
         """
         row, col = self.center  # extract the [y,x] of the center
-        opponent_color_at_center = self.get_opp_color(arg_boardstate.Grid[row, col])
+        opposite_color_at_center = self.get_opp_color(arg_boardstate.Grid[row, col])
         if not arg_boardstate.Grid[row, col] == 0:  # if not empty
-            if self.contains_count_of(self.surrounding_tiles, opponent_color_at_center, arg_boardstate) == \
+            if self.contains_count_of(self.surrounding_tiles, opposite_color_at_center, arg_boardstate) == \
              len(self.surrounding_tiles - 1):
+                # get a list of tuples containing empty
+                output = self.get_tuples_containing(self.surrounding_tiles, 0, arg_boardstate)
+
+                if len(output) == 1:
+                    self.scoring_player = self.get_opp_color(arg_boardstate.Grid[row, col])
+                    self.scoring_move = output[0]
+        else:
+            # No scoring move or scoring player for this strategy
+            self.scoring_move = [-1, -1]
+            self.scoring_player = 0
+
+    def determine_score_building_strategies(self, arg_boardstate):
+        # This method will populate the score building properties based on the center [row, col]
+        opp_color = self.get_opp_color(self.piece_color_at_center)
+        if self.piece_color_at_center == 0:
+            # color at center is empty (0)
+            self.score_builder = 0
+            self.is_score_building_opp = False
+            self.score_building_priority_level = 0
+            self.tag = "not a score building chance"
+            return
+
+        # point building strategies that have been spoiled (ie., when one of the surrounding piece is the same
+        # as the piece_at_center
+        if self.contains_count_of(self.surrounding_tiles, self.piece_color_at_center, arg_boardstate) > 0:
+            # not a good point-building strategy
+            self.score_builder = 0
+            self.is_score_building_opp = False
+            self.score_building_priority_level = 0
+            self.tag = "not a score-building chance as it has been blocked"
+            return
+
+        # A score building opportunity exists if there are >= 0 white spaces in the surrounding pieces
+        # but one less than the surrounding_piece length
+        if self.contains_count_of(self.surrounding_tiles, 0, arg_boardstate) > 0 and \
+         self.contains_count_of(self.surrounding_tiles, opp_color, arg_boardstate) < len(self.surrounding_tiles):
+            self.score_builder = opp_color
+            self.is_score_building_opp = True
+            self.score_building_priority_level = 6 - self.contains_count_of(self.surrounding_tiles, 0, arg_boardstate)
+            return
 
     @staticmethod
     def contains_count_of(arg_list_of, target, arg_boardstate):
