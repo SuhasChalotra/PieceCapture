@@ -42,12 +42,6 @@ class Game:
 
         # Keep track of the move number
         self.MoveNumber = 0
-        self.empty_spots = []
-
-        # Populate the empty spots list
-        for x in range(rows):
-            for y in range(cols):
-                self.empty_spots.append((x, y))
 
     def __assign_player_piece_color(self):
         """

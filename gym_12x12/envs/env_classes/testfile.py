@@ -12,5 +12,5 @@ g.place_piece(p1, 0, 2)
 g.place_piece(p2, 0, 3)
 g.print_game_board()
 
-strat = p2.do_ai_move(g.Board)
+strat = p2.get_ai_move(g.Board)
 print(strat)

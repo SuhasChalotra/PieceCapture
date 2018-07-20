@@ -42,6 +42,13 @@ class GameBoard:
         self.SPOT_BOTTOM_LEFT = (size_y - 1, 0)
         self.SPOT_BOTTOM_RIGHT = (size_y - 1, size_x - 1)
 
+        # Keeps track of empty spots
+        self.empty_spots = []
+        # Populate the empty spots list
+        for x in range(size_y):
+            for y in range(size_x):
+                self.empty_spots.append((x, y))
+
     def get_surrounding_pieces(self, row, col, diagonals=False):
         """
         This function will return  a list of the 2-4 surrounding pieces

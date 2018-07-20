@@ -64,15 +64,22 @@ class BotPlayer (Player):
     """
     An AI Player
     """
-    def __init__(self):
+    def __init__(self, dumb_bot=True):
+        """
+
+        :param dumb_bot: when set to true, bot makes random moves instead of smart AI moves
+        """
         self.name = "Bot_Player"
         self.enable_white_space_strategy = True  # for use in the bot AI logic
+        self.dumb_bot_logic = dumb_bot
 
-    def do_ai_move(self, arg_game_board_reference):
+    def get_ai_move(self, arg_game_board_reference):
         """
         :param arg_game_board_reference: the current state of the game board
         :return: should return [row, col] indicating where to play next
         """
+        if self.dumb_bot_logic:
+            return self.get_random_move()
         # this is the master list of all strategies from which we can pull out different sub-strategies
         # and boardstate assessments
         master_list = Strategy.get_all_strategies(arg_game_board_reference, self.piece_color)
