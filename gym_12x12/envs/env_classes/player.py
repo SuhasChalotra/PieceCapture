@@ -81,20 +81,34 @@ class BotPlayer (Player):
         """
 
         # Let's first determine if this AI Bot instance has the dumb_bot_logic flag turned on (true)
-        # which means it will pick a random move, instead of process the smart AI logic
+        # which means it will pick a random move, instead of doing the smart AI logic (if false)
         if self.dumb_bot_logic:
             return self.get_random_move(arg_game_board_reference.empty_spots)
 
         # this is the master list of all strategies from which we can pull out different sub-strategies
         # and boardstate assessments
+        return_move = [-1, -1]  # this is a default return value should everything else should return false
         master_list = Strategy.get_all_strategies(arg_game_board_reference, self.piece_color)
-        print(master_list)
 
         # Create a sub-list of strategies which will cause the AI to win on the next move
+        sl_point_scoring_strategies = self.get_ai_point_scoring_strategies(master_list)
 
         # Create a sub-list of strategies where AI must block its opponent from scoring
+        sl_point_blocking_strategies = self.get_defensive_block_strategies(master_list)
+
+        # Create sublist for defense against white_space_strategies
+        sl_white_space_defense_strategies = self.get_white_space_defense_strats(master_list)
 
         # Create a sub-list of strategies that allow the AI to play moves that will lead it to a score a point
+        sl_point_building_strategies = self.get_point_building_strats(master_list)
+
+        # Create offensive white space
+        sl_white_space_def = self.get_white_space_offensive_str(master_list, arg_game_board_reference)
+
+        # remaining strategies (left overs)
+        sl_rem_strats = self.get_remaining_strats(master_list)
+
+        return return_move
 
     def get_random_move(self, empty_move_list):
         """
@@ -131,13 +145,119 @@ class BotPlayer (Player):
 
             s_pieces = board_ref.get_surrounding_pieces(r, c, diagonals=False)
             if board_ref.get_count_of(opp_color, s_pieces) == len(s_pieces) - 1 and \
-            board_ref.get_count_of(0, s_pieces) == 1:
+               board_ref.get_count_of(0, s_pieces) == 1:
                 return True
 
             if board_ref.get_count_of(opp_color, s_pieces) == len(s_pieces):
                 return True
 
         return False
+
+    def get_ai_point_scoring_strategies(self, master_list_source):
+        """
+
+        :param master_list_source:
+        :return:
+        """
+        # Validation - make sure master list is of type list
+        if not isinstance(master_list_source, list):
+            raise ValueError("Parameter master_list_source must be of type list")
+
+        if not all(isinstance(element, Strategy) for element in master_list_source):
+            raise ValueError("Issues with master_list_source as not all elements are of type 'Strategy'")
+
+        return_list = []
+
+        for strategy in master_list_source:
+            if strategy.scoring_player == self.piece_color:
+                return_list.append(strategy)
+
+        return return_list
+
+    def get_defensive_block_strategies(self, master_list_source):
+        """
+
+        :param master_list_source:
+        :return:
+        """
+        # Validation
+        if not isinstance(master_list_source, list):
+            raise ValueError("Parameter master_list_source must be of type list")
+
+        if not all(isinstance(element, Strategy) for element in master_list_source):
+            raise ValueError("Issues with master_list_source as not all elements are of type 'Strategy'")
+
+        return_list = []
+        for strategy in master_list_source:
+            if strategy.block_priority_level >= 2 and strategy.is_block_opportunity \
+               and strategy.block_defender_player == self.piece_color:
+                return_list.append(strategy)
+
+        return return_list
+
+    def get_white_space_defense_strats(self, master_list):
+        """
+
+        :param master_list:
+        :return:
+        """
+        if not isinstance(master_list, list):
+            raise ValueError("Parameter must be of type list")
+
+        return_list = []
+        for strategy in master_list:
+            if strategy.is_white_space_block_opportunity == True and strategy.white_space_block_priority >= 2:
+                return_list.append(strategy)
+
+        return return_list
+
+    def get_white_space_offensive_str(self, master_list, board_state):
+        """
+        This is where we search for white space building strategies
+        :param master_list:
+        :param board_state:
+        :return: a list of strategies
+        """
+        if not isinstance(master_list, list):
+            raise ValueError("master_list must be of type list")
+
+        opp_color = self.get_opp_color()
+        return_list = []
+        for strategy in master_list:
+            if strategy.piece_color_at_center == 0 or strategy.piece_color_at_center == self.piece_color:
+                if Strategy.contains_count_of(strategy.surrounding_tiles_diagonal, opp_color, board_state) \
+                   > 0 or Strategy.contains_count_of(strategy.surrounding_tiles_diagonal, 0, board_state) == 0:
+                    continue
+                else:
+                    return_list.append(strategy)
+
+        return return_list
+
+    def get_point_building_strats(self, master_list):
+        """
+
+        :param master_list:
+        :return:
+        """
+        if not isinstance(master_list, list):
+            raise ValueError("Needs to be of type list")
+        return_list = []
+
+        for strategy in master_list:
+            if strategy.score_builder == self.piece_color:
+                return_list.append(strategy)
+
+        return return_list
+
+    def get_remaining_strats(self, master_list):
+        if not isinstance(master_list, list):
+            raise ValueError("master list must be of type list")
+        return_list = []
+        for strategy in master_list:
+            if len(strategy.possible_moves) > 0:
+                return_list.append(strategy)
+
+        return return_list
 
 
 class Strategy:

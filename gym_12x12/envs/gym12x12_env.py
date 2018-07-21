@@ -7,6 +7,7 @@ PLAYERTYPE_HUMAN = 2
 PLAYERTYPE_AGENT = 1
 PLAYERTYPE_BOT = 0
 
+
 class gym12x12_env(gym.Env):
 
     def __init__(self):
