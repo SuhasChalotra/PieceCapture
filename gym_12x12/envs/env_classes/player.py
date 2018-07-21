@@ -45,6 +45,7 @@ class Player (ABC):
         else:
             return 0 # Invalid
 
+
 class HumanPlayer (Player):
     """
     A human player will be prompted to make its move via the keyboard input

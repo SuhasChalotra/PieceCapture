@@ -114,8 +114,9 @@ class gym12x12_env(gym.Env):
             pass
 
     @staticmethod
-    def create_player(player_type):
+    def create_player(player_type, dumb_bot_ai=True):
         """
+        :param dumb_bot_ai: Only applies to type Bot: True = use random move strategy, false = use smart AI algorithm
         :param player_type: Specify either a player or an AI
         :return: returns the requested player type
         """
@@ -128,8 +129,10 @@ class gym12x12_env(gym.Env):
             return AgentPlayer()
 
         elif player_type == PLAYERTYPE_BOT:
-
-            return BotPlayer()
+            if dumb_bot_ai:
+                return BotPlayer(True)
+            else:
+                return BotPlayer(False)
 
     def alternate_player(self):
         if self.CurrentPlayer == self.Game.Player1:
