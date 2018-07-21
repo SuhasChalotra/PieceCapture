@@ -100,7 +100,7 @@ class gym12x12_env(gym.Env):
         """
         if isinstance(self.CurrentPlayer, BotPlayer):
             # Check if it's bot
-            move = BotPlayer.make_random_move(self.Game.empty_spots)
+            move = BotPlayer.get_ai_move(self.Game.empty_spots)
             valid_m, p1_reward, p2_reward = self.Game.place_piece(self.CurrentPlayer, move[0], move[1])
             # self.alternate_player()
 

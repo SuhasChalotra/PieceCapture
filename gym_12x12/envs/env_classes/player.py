@@ -303,10 +303,11 @@ class Strategy:
         :return: void
         """
         row, col = self.center  # extract the [y,x] of the center
-        opposite_color_at_center = self.get_opp_color(arg_boardstate.Grid[row, col])
+
         if not arg_boardstate.Grid[row, col] == 0:  # if not empty
+            opposite_color_at_center = self.get_opp_color(arg_boardstate.Grid[row, col])
             if self.contains_count_of(self.surrounding_tiles, opposite_color_at_center, arg_boardstate) == \
-             len(self.surrounding_tiles - 1):
+               len(self.surrounding_tiles) - 1:
                 # get a list of tuples containing empty
                 output = self.get_tuples_containing(self.surrounding_tiles, 0, arg_boardstate)
 
@@ -342,7 +343,7 @@ class Strategy:
         # A score building opportunity exists if there are >= 0 white spaces in the surrounding pieces
         # but one less than the surrounding_piece length
         if self.contains_count_of(self.surrounding_tiles, 0, arg_boardstate) > 0 and \
-         self.contains_count_of(self.surrounding_tiles, opp_color, arg_boardstate) < len(self.surrounding_tiles):
+           self.contains_count_of(self.surrounding_tiles, opp_color, arg_boardstate) < len(self.surrounding_tiles):
             self.score_builder = opp_color
             self.is_score_building_opp = True
             self.score_building_priority_level = 6 - self.contains_count_of(self.surrounding_tiles, 0, arg_boardstate)
@@ -392,6 +393,7 @@ class Strategy:
             if arg_boardstate.Grid[row, col] == target:
                 return_list.append(item)
 
+        return return_list
 
     @staticmethod
     def get_opp_color(arg_in_color):
