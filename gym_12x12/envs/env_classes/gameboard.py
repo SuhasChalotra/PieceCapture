@@ -44,6 +44,7 @@ class GameBoard:
 
         # Keeps track of empty spots
         self.empty_spots = []
+        self.board_size = self.ROW_COUNT * self.COL_COUNT
         # Populate the empty spots list
         for x in range(size_y):
             for y in range(size_x):

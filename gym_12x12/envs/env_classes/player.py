@@ -87,7 +87,7 @@ class BotPlayer (Player):
 
         # this is the master list of all strategies from which we can pull out different sub-strategies
         # and boardstate assessments
-        return_move = [-1, -1]  # this is a default return value should everything else should return false
+
         master_list = Strategy.get_all_strategies(arg_game_board_reference, self.piece_color)
 
         # Create a sub-list of strategies which will cause the AI to win on the next move
@@ -103,12 +103,93 @@ class BotPlayer (Player):
         sl_point_building_strategies = self.get_point_building_strats(master_list)
 
         # Create offensive white space
-        sl_white_space_def = self.get_white_space_offensive_str(master_list, arg_game_board_reference)
+        sl_white_space_off = self.get_white_space_offensive_str(master_list, arg_game_board_reference)
 
         # remaining strategies (left overs)
         sl_rem_strats = self.get_remaining_strats(master_list)
 
+        return_move = self.process_sub_strategies(sl_point_scoring_strategies, sl_point_blocking_strategies,
+                                                  sl_white_space_defense_strategies, sl_point_building_strategies,
+                                                  sl_white_space_off, sl_rem_strats)
         return return_move
+
+    def process_sub_strategies(self, pt_scoring, pt_blocking, white_space_def, pt_build, off_ws_str,
+                               remaining_str, board_state):
+        """
+        :param pt_scoring: point scoring strategy
+        :param pt_blocking: strategies that block opponent from scoring
+        :param white_space_def: block opponent's white space
+        :param pt_build: strategies that build scoring opportunities for Bot
+        :param off_ws_str: build white-space strategy
+        :param remaining_str: else
+        :return: [row, col] move
+
+        """
+        strat_return_move = [-1, -1]
+
+        # 1) Determine point scoring strategies
+        if len(pt_scoring) > 0:
+            tryCount = 0
+            while True:
+                if tryCount >= board_state.board_size:
+                    break
+
+                int_pick = randint(0, len(pt_scoring))
+                strat_return_move = pt_scoring[int_pick].scoring_move
+
+                if not self.will_move_endanger_player(strat_return_move, board_state):
+                    print("Point scoring strategy taken")
+                    return strat_return_move
+                else:
+                    tryCount += 1
+
+        # 2) Determine point blocking strategies (block opponent from making next move that scores)
+        if len(pt_blocking) > 0:
+            L4, L3, L2 = self.extract_blocking_strategies(pt_blocking, self.piece_color)  # extract all levels blocking
+            if len(L4) > 0:
+                int_pick = randint(0, len(L4))
+                r_pick = randint(0, len(L4[int_pick].possible_moves))
+                strat_return_move = L4[int_pick].possible_moves[r_pick]
+                print("Lvl 4 Point block strategy taken")
+                return strat_return_move
+
+            if len(L3) > 0:
+                int_pick = randint(0, len(L3))
+                r_pick = randint(0, len(L3[int_pick].possible_moves))
+                strat_return_move = L3[int_pick].possible_moves[r_pick]
+                print("Lvl 3 Point block strategy taken")
+                return strat_return_move
+
+            if len(L2) > 0:
+                int_pick = randint(0, len(L2))
+                r_pick = randint(0, len(L2[int_pick].possible_moves))
+                strat_return_move = L2[int_pick].possible_moves[r_pick]
+                print("Lvl 2 Point block strategy taken")
+                return strat_return_move
+
+
+        return strat_return_move
+
+    def extract_blocking_strategies(self, master_block_list, defender):
+        """
+        returns three lists list of level 4, 3, 2 block priorities
+        :param master_block_list:
+        :param defender: piece color being attacked. Cannot be empty
+        :return: level4_List[], level3_List[], level2_List[]
+        """
+        level_4_list = []
+        level_3_list = []
+        level_2_list = []
+
+        for strat in master_block_list:
+            if strat.block_priority_level == 4 and strat.block_defender_player == defender:
+                level_4_list.append(strat)
+            elif strat.block_priority_level == 3 and strat.block_defender_player == defender:
+                level_3_list.append(strat)
+            elif strat.block_priority_level == 3 and strat.block_defender_player == defender:
+                level_2_list.append(strat)
+
+        return level_4_list, level_3_list, level_2_list
 
     def get_random_move(self, empty_move_list):
         """
@@ -122,9 +203,6 @@ class BotPlayer (Player):
                 return empty_move_list[choice]
             else:
                 return -1, -1  # Signifies that there are no empty moves left
-
-    def make_strategic_move(self):
-        pass
 
     def will_move_endanger_player(self, move, board_ref):
         """
