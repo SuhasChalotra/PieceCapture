@@ -83,7 +83,7 @@ class BotPlayer (Player):
         # Let's first determine if this AI Bot instance has the dumb_bot_logic flag turned on (true)
         # which means it will pick a random move, instead of doing the smart AI logic (if false)
         if self.dumb_bot_logic:
-            return self.get_random_move(arg_game_board_reference.empty_spots)
+            return self.get_random_element(arg_game_board_reference.empty_spots)
 
         # this is the master list of all strategies from which we can pull out different sub-strategies
         # and boardstate assessments
@@ -191,32 +191,110 @@ class BotPlayer (Player):
                             int_count += 1
 
         # 4) Point scoring-build strategies
-        if self.enable_white_space_strategy:
-            if len(white_space_def) > 0:
-                # we should make sure we check for any white space
-                selected_advanced_strategies = []
-                for str_w_space in white_space_def:
-                    # proritize white space strategies already in play
-                        if Strategy.contains_count_of(str_w_space.surrounding_tiles_diagonal, self.piece_color,
-                                                      board_state) > 0 and \
-                               Strategy.contains_count_of(str_w_space, self.piece_color, board_state) < \
-                               len(str_w_space.surrounding_tiles_diagonal) and \
-                               Strategy.contains_count_of(str_w_space.surrounding_tiles_diagonal, 0, board_state) > 0:
-                            selected_advanced_strategies.append(str_w_space)
+        if len(pt_build) > 0:
+            if self.enable_white_space_strategy:
+                if len(white_space_def) > 0:
+                    # we should make sure we check for any white space
+                    selected_advanced_strategies = []
+                    for str_w_space in white_space_def:
+                        # proritize white space strategies already in play
+                            if Strategy.contains_count_of(str_w_space.surrounding_tiles_diagonal, self.piece_color,
+                                                          board_state) > 0 and \
+                                   Strategy.contains_count_of(str_w_space, self.piece_color, board_state) < \
+                                   len(str_w_space.surrounding_tiles_diagonal) and \
+                                   Strategy.contains_count_of(str_w_space.surrounding_tiles_diagonal, 0, board_state) > 0:
+                                selected_advanced_strategies.append(str_w_space)
 
-                # check the newly-formed list and make sure it's greater than zero
-                if len(selected_advanced_strategies) > 0:
-                    int_highCount = 1
-                    int_target_index = -1
-                    int_c = 0
-                    # choose the highest
-                    for _s in selected_advanced_strategies:
+                    # check the newly-formed list and make sure it's greater than zero
+                    if len(selected_advanced_strategies) > 0:
+                        int_high_count = 1
+                        int_target_index = -1
+                        int_c = 0
+                        # choose the highest
+                        for _s in selected_advanced_strategies:
+                            if Strategy.contains_count_of(_s.surrounding_tiles_diagonal, self.piece_color, board_state) > int_high_count:
+                                int_high_count = Strategy.contains_count_of(_s.surrounding_tiles_diagonal, self.piece_color, board_state)
+                                int_target_index = int_c
 
+                            int_c += 1
 
+                        if int_target_index >= 0:
+                            ws_return_move = self.get_random_element(selected_advanced_strategies[int_target_index].possible_moves_diagonal)
+                            print("White space advanced off strategy chosen")
+                            return ws_return_move
 
+            # No advanced white space strategies were found, so continue on with point building strategies
+            # Extract and sort out the strategies by point_building priority level
+            L4, L3, L2 = self.extract_point_building_strategies(pt_build, self.piece_color)
 
+            if len(L4) > 0:
+                int_count_break = 0
+                while True:
+                    if int_count_break >= len(board_state.empty_spots):
+                        break
 
-        return strat_return_move
+                    int_pb_pick = randint(0, len(L4))
+                    move_choice = self.get_random_element(L4[int_pb_pick].possible_moves) # this is a tuple
+                    # make sure the move won't endanger the AI
+                    if not self.will_move_endanger_player(move_choice, board_state) and not self.will_move_spoil_white_space_strat(move_choice, board_state):
+                        print("Level 4 Point building strategy taken")
+                        return move_choice
+                    else:
+                        int_count_break += 1
+
+            if len(L3) > 0:
+                int_count_break = 0
+                while True:
+                    if int_count_break >= len(board_state.empty_spots):
+                        break
+
+                    int_pb_pick = randint(0, len(L3))
+                    move_choice = self.get_random_element(L3[int_pb_pick].possible_moves)  # this is a tuple
+                    # make sure the move won't endanger the AI
+                    if not self.will_move_endanger_player(move_choice, board_state) and not self.will_move_spoil_white_space_strat(move_choice, board_state):
+                        print("Level 3 Point building strategy taken")
+                        return move_choice
+                    else:
+                        int_count_break += 1
+
+            if len(L2) > 0:
+                int_count_break = 0
+                while True:
+                    if int_count_break >= len(board_state.empty_spots):
+                        break
+
+                    int_pb_pick = randint(0, len(L2))
+                    move_choice = self.get_random_element(L2[int_pb_pick].possible_moves)  # this is a tuple
+                    # make sure the move won't endanger the AI
+                    if not self.will_move_endanger_player(move_choice, board_state) and not self.will_move_spoil_white_space_strat(move_choice, board_state):
+                        print("Level 2 Point building strategy taken")
+                        return move_choice
+                    else:
+                        int_count_break += 1
+
+        # Finally we check remaining strategies
+        """
+        At this point no viable strategies have been found (it's probably close to the end of the game. Let's sort out the remaining strategies and get the ones where there are 
+        possible moves to play. Let's randomly pick
+        """
+        if len(remaining_str) > 0:
+            int_count = 0
+            while True:
+                if int_count > len(board_state.empty_spots):
+                    break
+
+                strategy_chosen = self.get_random_element(remaining_str)  # get a random strategy
+
+                for possible_move_option in strategy_chosen.possible_moves:
+                    if not self.will_move_endanger_player(possible_move_option, board_state):
+                        return possible_move_option
+
+                int_count += 1
+
+            # if all else fails, we must pick a random empty spot
+            return self.get_random_element(board_state.empty_spots)
+
+        return strat_return_move # if this is [-1, -1] then there are literally no more spots left, game should complete
 
     def extract_blocking_strategies(self, master_block_list, defender):
         """
@@ -239,7 +317,30 @@ class BotPlayer (Player):
 
         return level_4_list, level_3_list, level_2_list
 
-    def get_random_move(self, empty_move_list):
+    def extract_point_building_strategies(self, master_pb_list, arg_int_builder):
+        """
+        returns three lists lists of level 4, 3, 2 point building priorities
+        :param master_pb_list: the pre-filtered list of point blocking strategies
+        :param arg_int_builder: the player building the scoring opp
+        :return: List of List containing Level 4, 3, 2 strategies
+        """
+        level_4_list = []
+        level_3_list = []
+        level_2_list = []
+
+        for strat in master_pb_list:
+            if strat.is_score_building_opp:
+                if strat.score_builder == arg_int_builder:
+                    if strat.score_building_priority_level == 4:
+                        level_4_list.append(strat)
+                    elif strat.score_building_priority_level == 3:
+                        level_3_list.append(strat)
+                    elif strat.score_building_priority_level == 2:
+                        level_2_list.append(strat)
+
+        return level_4_list, level_3_list, level_2_list
+
+    def get_random_element(self, empty_move_list):
         """
         This function returns a random spot to play
         :empty_move_list: the cached list of available moves
@@ -276,6 +377,28 @@ class BotPlayer (Player):
 
             if board_ref.get_count_of(opp_color, s_pieces) == len(s_pieces):
                 return True
+
+        return False
+    def will_move_spoil_white_space_strat(self, move, boardref):
+        """
+        This evaluates if the next move will cancel out (spoil) a white space hole /trap. The AI shoudn't spoil its own white space strategies
+        :param move: [row, col] a move
+        :param boardref: reference to the current state of the gameboard
+        :return: bool
+        """
+        if not isinstance(boardref, GameBoard):
+            raise ValueError("Invalid gameboard reference")
+
+        if not isinstance(move, list) and not isinstance(move, tuple):
+            raise ValueError("Move parameter must be a tuple or list of coordinates [row, col]")
+
+
+        # first we get the surrounding piecs
+        row, col = move
+        sur_pieces = boardref.get_surrounding_pieces(row, col)
+
+        if Strategy.contains_count_of(sur_pieces, self.piece_color, boardref) == len(sur_pieces):
+            return True
 
         return False
 
@@ -496,11 +619,9 @@ class Strategy:
         """
         r_value = 0
         if self.piece_color_at_center == 0:
-            if self.contains_count_of(self.surrounding_tiles, 0, arg_boardstate) > 0 and \
-             self.contains_count_of(self.surrounding_tiles, self.in_piece, arg_boardstate) == 0:
+            if self.contains_count_of(self.surrounding_tiles, 0, arg_boardstate) > 0 and self.contains_count_of(self.surrounding_tiles, self.in_piece, arg_boardstate) == 0:
                 if self.contains_count_of(self.surrounding_tiles, self.out_piece, arg_boardstate) > 0:
-                    r_value = 6 - len(self.possible_moves) - \
-                     self.contains_count_of(self.possible_moves, 0, arg_boardstate)
+                    r_value = 6 - len(self.possible_moves) - self.contains_count_of(self.possible_moves, 0, arg_boardstate)
                     self.is_white_space_block_opportunity = True
 
         return r_value
