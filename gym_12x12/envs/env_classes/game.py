@@ -43,6 +43,24 @@ class Game:
         # Keep track of the move number
         self.MoveNumber = 0
 
+        # keep track of game running status
+        self.game_is_on = False
+
+    def start(self):
+        self.game_is_on = True
+
+    def stop(self):
+        self.game_is_on = False
+
+    def reset(self):
+        """
+        Should reset the game
+        :return:
+        """
+        self.PlayerOneScore = 0
+        self.PlayerTwoScore = 0
+        self.Board.clear()  # this should reset empty spots and clear the game board
+
     def __assign_player_piece_color(self):
         """
         This private method will ensure that the Player1 is BLUE and Player2 is RED
@@ -58,6 +76,9 @@ class Game:
         :param xloc: Columns (horizontal)
         :return: int, int_p1_pointScored, int_p2_pointScored
         """
+        if not self.game_is_on:
+            raise ValueError("Game has not started")
+
         # yloc and xloc need to be within range and be valid integers
         if arg_player.piece_color == Game.BLUE_PIECE:
             blue_reward = Game.INVALID_MOVE_PENALIZATION
@@ -159,6 +180,7 @@ class Game:
         if len(self.empty_spots) > 0:
             return False
         else:
+            self.game_is_on = False
             return True
 
     def piece_surrounded_alt(self,row, col, adjacent_pieces = None):

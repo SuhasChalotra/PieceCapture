@@ -43,7 +43,7 @@ class Player (ABC):
         elif self.piece_color == 2:
             return 1
         else:
-            return 0 # Invalid
+            return 0  # Invalid
 
 
 class HumanPlayer (Player):

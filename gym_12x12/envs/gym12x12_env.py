@@ -78,6 +78,7 @@ class gym12x12_env(gym.Env):
             raise ValueError("Game not propely initiated. Check action or observation spaces")
 
         self.Game.Board.clear()
+        self.Game.start()
         self.CurrentPlayer = self.Game.Player1  # Player 1 always starts
 
         # If the current player (player1) is not Agent, then we call our make non-agent move function and
@@ -90,7 +91,7 @@ class gym12x12_env(gym.Env):
 
         else:
             # Essentially returning an empty board (and initial observation)
-            return self.Game.Board.Grid
+            return self.Game.Board.Grid, 0, 0
 
     def close(self):
         pass
@@ -104,7 +105,7 @@ class gym12x12_env(gym.Env):
         """
         if isinstance(self.CurrentPlayer, BotPlayer):
             # Check if it's bot
-            move = BotPlayer.get_ai_move(self.Game.empty_spots)
+            move = self.CurrentPlayer.get_ai_move(self.Game.Board)
             valid_m, p1_reward, p2_reward = self.Game.place_piece(self.CurrentPlayer, move[0], move[1])
             # self.alternate_player()
 
@@ -155,6 +156,7 @@ class gym12x12_env(gym.Env):
         self.Game = Game(arg_player1, arg_player2, rows=arg_int_boardsize, cols=arg_int_boardsize)
         self.CurrentPlayer = self.Game.Player1
         self.action_space = spaces.Discrete(arg_int_boardsize * arg_int_boardsize)
-        self.observation_space = spaces.Box(high=-1000.0, low=1000.0, shape=[arg_int_boardsize, arg_int_boardsize], dtype=float)
+        self.observation_space = spaces.Box(high=2, low=0, shape=[arg_int_boardsize, arg_int_boardsize], dtype=int)
+
 
 

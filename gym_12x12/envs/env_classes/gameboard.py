@@ -45,9 +45,12 @@ class GameBoard:
         # Keeps track of empty spots
         self.empty_spots = []
         self.board_size = self.ROW_COUNT * self.COL_COUNT
+
+        self._reset_empty_spots()  # reset the empty spot cash
+    def _reset_empty_spots(self):
         # Populate the empty spots list
-        for x in range(size_y):
-            for y in range(size_x):
+        for x in range(self.ROW_COUNT):
+            for y in range(self.COL_COUNT):
                 self.empty_spots.append((x, y))
 
     def get_surrounding_pieces(self, row, col, diagonals=False):
@@ -86,6 +89,7 @@ class GameBoard:
     def clear(self):
         # Clear the game grid
         self.Grid = np.zeros([self.ROW_COUNT, self.COL_COUNT], dtype=int)
+        self._reset_empty_spots()
 
     def _remove_invalid_tuples(self, surrounding_p):
         """
