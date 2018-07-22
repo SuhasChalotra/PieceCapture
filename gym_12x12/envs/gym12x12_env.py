@@ -155,6 +155,6 @@ class gym12x12_env(gym.Env):
         self.Game = Game(arg_player1, arg_player2, rows=arg_int_boardsize, cols=arg_int_boardsize)
         self.CurrentPlayer = self.Game.Player1
         self.action_space = spaces.Discrete(arg_int_boardsize * arg_int_boardsize)
-        self.observation_space = spaces.Box(3, arg_int_boardsize, arg_int_boardsize)
+        self.observation_space = spaces.Box(high=-1000.0, low=1000.0, shape=[arg_int_boardsize, arg_int_boardsize], dtype=float)
 
 
