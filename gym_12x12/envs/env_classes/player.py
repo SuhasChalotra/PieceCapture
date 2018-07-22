@@ -116,12 +116,14 @@ class BotPlayer (Player):
     def process_sub_strategies(self, pt_scoring, pt_blocking, white_space_def, pt_build, off_ws_str,
                                remaining_str, board_state):
         """
+        This is a helper function to sort out all the lists of different strategies
         :param pt_scoring: point scoring strategy
         :param pt_blocking: strategies that block opponent from scoring
         :param white_space_def: block opponent's white space
         :param pt_build: strategies that build scoring opportunities for Bot
         :param off_ws_str: build white-space strategy
         :param remaining_str: else
+        :param board_state: board state
         :return: [row, col] move
 
         """
@@ -129,9 +131,9 @@ class BotPlayer (Player):
 
         # 1) Determine point scoring strategies
         if len(pt_scoring) > 0:
-            tryCount = 0
+            try_count = 0
             while True:
-                if tryCount >= board_state.board_size:
+                if try_count >= board_state.board_size:
                     break
 
                 int_pick = randint(0, len(pt_scoring))
@@ -141,11 +143,13 @@ class BotPlayer (Player):
                     print("Point scoring strategy taken")
                     return strat_return_move
                 else:
-                    tryCount += 1
+                    try_count += 1
 
         # 2) Determine point blocking strategies (block opponent from making next move that scores)
         if len(pt_blocking) > 0:
             L4, L3, L2 = self.extract_blocking_strategies(pt_blocking, self.piece_color)  # extract all levels blocking
+            # the higher the level, the greater the priority. Pick a random strategy and random possible move from
+            # the chosen strategy and return that
             if len(L4) > 0:
                 int_pick = randint(0, len(L4))
                 r_pick = randint(0, len(L4[int_pick].possible_moves))
@@ -166,6 +170,50 @@ class BotPlayer (Player):
                 strat_return_move = L2[int_pick].possible_moves[r_pick]
                 print("Lvl 2 Point block strategy taken")
                 return strat_return_move
+
+        # 3) White space defensive block strategies
+        if len(white_space_def) > 0:
+            for strat in white_space_def:
+                if strat.white_space_block_priority >= 4:
+                    # anaylze possible moves and make sure they don't endanger the Bot Player
+                    int_count = 0
+                    while True:
+                        if int_count >= len(strat.possible_moves) + 5:
+                            break
+
+                        int_pick = randint(0, len(strat.possible_moves))
+                        list_considered_move = strat.possible_moves[int_pick]
+
+                        if not self.will_move_endanger_player(list_considered_move, board_state):
+                            print("White space defensive block strategy chosen")
+                            return list_considered_move
+                        else:
+                            int_count += 1
+
+        # 4) Point scoring-build strategies
+        if self.enable_white_space_strategy:
+            if len(white_space_def) > 0:
+                # we should make sure we check for any white space
+                selected_advanced_strategies = []
+                for str_w_space in white_space_def:
+                    # proritize white space strategies already in play
+                        if Strategy.contains_count_of(str_w_space.surrounding_tiles_diagonal, self.piece_color,
+                                                      board_state) > 0 and \
+                               Strategy.contains_count_of(str_w_space, self.piece_color, board_state) < \
+                               len(str_w_space.surrounding_tiles_diagonal) and \
+                               Strategy.contains_count_of(str_w_space.surrounding_tiles_diagonal, 0, board_state) > 0:
+                            selected_advanced_strategies.append(str_w_space)
+
+                # check the newly-formed list and make sure it's greater than zero
+                if len(selected_advanced_strategies) > 0:
+                    int_highCount = 1
+                    int_target_index = -1
+                    int_c = 0
+                    # choose the highest
+                    for _s in selected_advanced_strategies:
+
+
+
 
 
         return strat_return_move

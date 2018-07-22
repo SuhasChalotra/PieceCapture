@@ -3,9 +3,12 @@ from gym_12x12.envs.env_classes.player import Player, HumanPlayer, BotPlayer, Ag
 from gym_12x12.envs.env_classes.game import Game
 from gym import spaces
 
-PLAYERTYPE_HUMAN = 2
-PLAYERTYPE_AGENT = 1
-PLAYERTYPE_BOT = 0
+
+class PlayerType:
+
+    HUMAN = 2
+    AGENT = 1
+    BOT = 0
 
 
 class gym12x12_env(gym.Env):
@@ -121,15 +124,15 @@ class gym12x12_env(gym.Env):
         :param player_type: Specify either a player or an AI
         :return: returns the requested player type
         """
-        if player_type == PLAYERTYPE_HUMAN:
+        if player_type == PlayerType.HUMAN:
 
             return HumanPlayer()
 
-        elif player_type == PLAYERTYPE_AGENT:
+        elif player_type == PlayerType.AGENT:
 
             return AgentPlayer()
 
-        elif player_type == PLAYERTYPE_BOT:
+        elif player_type == PlayerType.BOT:
             if dumb_bot_ai:
                 return BotPlayer(True)
             else:
