@@ -38,9 +38,9 @@ class gym12x12_env(gym.Env):
         done_flag = self.Game.is_game_complete()
         return_dict = []
 
-        if not move_results:
+        if not move_results or done_flag:
             # We must abort the step function and return the reward_tally (which should be negative)
-            return self.Game.Board.Grid, agent_master_reward_tally, done_flag, return_dict
+            return self.Game.Board, agent_master_reward_tally, done_flag, return_dict
 
         self.alternate_player()  # switch players
 
@@ -56,7 +56,7 @@ class gym12x12_env(gym.Env):
 
             done_flag = self.Game.is_game_complete()
 
-        self.alternate_player()  # again, we alternate the player
+        # self.alternate_player()  # again, we alternate the player
         return self.Game.Board.Grid, agent_master_reward_tally, done_flag, return_dict
         #  observations, rewards, done, info
 
@@ -87,11 +87,16 @@ class gym12x12_env(gym.Env):
             # Call our make_non_agent_move method
             init_observation, p1r, p2r = self.make_non_agent_move()
             # Return an initial observation based on this move
+            print("Initial reset move ", self.CurrentPlayer.name)
+            self.alternate_player()
+
             return init_observation
 
         else:
             # Essentially returning an empty board (and initial observation)
-            return self.Game.Board.Grid, 0, 0
+            print("Initial reset move ", self.CurrentPlayer.name)
+            self.alternate_player()
+            return self.Game.Board, 0, 0
 
     def close(self):
         pass
@@ -107,10 +112,9 @@ class gym12x12_env(gym.Env):
             # Check if it's bot
             move = self.CurrentPlayer.get_ai_move(self.Game.Board)
             valid_m, p1_reward, p2_reward = self.Game.place_piece(self.CurrentPlayer, move[0], move[1])
-            # self.alternate_player()
 
             # We need to return an obs and reward
-            return self.Game.Board.Grid, p1_reward, p2_reward
+            return self.Game.Board, p1_reward, p2_reward
 
         elif isinstance(self.CurrentPlayer, HumanPlayer):
             # go in some input loop ensuring the Human player's input is valid
@@ -119,10 +123,11 @@ class gym12x12_env(gym.Env):
             pass
 
     @staticmethod
-    def create_player(player_type, dumb_bot_ai=True):
+    def create_player(player_type, argname, dumb_bot_ai=True):
         """
         :param dumb_bot_ai: Only applies to type Bot: True = use random move strategy, false = use smart AI algorithm
         :param player_type: Specify either a player or an AI
+        :param argname: friendly name
         :return: returns the requested player type
         """
         if player_type == PlayerType.HUMAN:
@@ -135,15 +140,19 @@ class gym12x12_env(gym.Env):
 
         elif player_type == PlayerType.BOT:
             if dumb_bot_ai:
-                return BotPlayer(True)
+                return BotPlayer(dumb_bot=dumb_bot_ai, arg_name=argname)
             else:
-                return BotPlayer(False)
+                return BotPlayer(dumb_bot=dumb_bot_ai, arg_name=argname)
 
     def alternate_player(self):
         if self.CurrentPlayer == self.Game.Player1:
+            print("===ALTERNATE: Player was p1, now p2")
             self.CurrentPlayer = self.Game.Player2
-        else:
+        elif self.CurrentPlayer == self.Game.Player2:
+            print("===ALTERNATE: Player was p2, now p1")
             self.CurrentPlayer = self.Game.Player1
+        else:
+            raise ValueError("Player alternation error")
 
     def initiate_game(self, arg_player1, arg_player2, arg_int_boardsize):
         # When the game is initialized we

@@ -79,6 +79,11 @@ class Game:
         if not self.game_is_on:
             raise ValueError("Game has not started")
 
+        # if self.is_game_complete():
+        #     # Game is completed
+        #     self.game_is_on = False
+        #     return
+
         # yloc and xloc need to be within range and be valid integers
         if arg_player.piece_color == Game.BLUE_PIECE:
             blue_reward = Game.INVALID_MOVE_PENALIZATION
@@ -114,7 +119,7 @@ class Game:
             return Game.GAME_MOVE_VALID,  reward_results[0], reward_results[1]
 
         else:
-            print("Invalid move. Try again.")
+            print(yloc, xloc, " is an Invalid move. Try again.")
             return Game.GAME_MOVE_INVALID, blue_reward, red_reward
 
     def print_game_board(self):
@@ -177,7 +182,7 @@ class Game:
         otherwise return false.
         :return: boolean. returns True if there are no empty spots left on the game board
         """
-        if len(self.empty_spots) > 0:
+        if len(self.Board.empty_spots) > 0:
             return False
         else:
             self.game_is_on = False

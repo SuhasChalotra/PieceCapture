@@ -47,6 +47,7 @@ class GameBoard:
         self.board_size = self.ROW_COUNT * self.COL_COUNT
 
         self._reset_empty_spots()  # reset the empty spot cash
+
     def _reset_empty_spots(self):
         # Populate the empty spots list
         for x in range(self.ROW_COUNT):
