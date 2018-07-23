@@ -9,4 +9,7 @@ Status: resolved - 07.22.2018
 07.22.2018 - 001.00 - when playing Bot v Bot, the final move always seems to be [5,5]
 however the previous 4 moves are not the same sequence. The final move shouldn't always be 
 the same spot.
+Status: resolved - 07.22.2018 - 
+
+07.22.2018 - 002.00 - AI generally buggy. The scoring is too high. It should be more stalemate
 Status: open

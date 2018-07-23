@@ -349,7 +349,7 @@ class BotPlayer (Player):
         :empty_move_list: the cached list of available moves
         :return: [row,col]
         """
-        if isinstance(empty_move_list, list):
+        if isinstance(empty_move_list, list) or isinstance(empty_move_list, tuple):
             if len(empty_move_list) > 0:
                 choice = randint(0, len(empty_move_list) - 1)
                 return empty_move_list[choice]
@@ -583,8 +583,8 @@ class Strategy:
         list_of_strategies = []  # Blank List of all possible strategies centered around a  at [rows, cols]
 
         if isinstance(arg_game_board_reference, GameBoard):
-            for rows in range(0, len(arg_game_board_reference.Grid) - 1):
-                for cols in range(0, arg_game_board_reference.COL_COUNT - 1):
+            for rows in range(0, len(arg_game_board_reference.Grid)):
+                for cols in range(0, arg_game_board_reference.COL_COUNT):
                     s = Strategy(arg_game_board_reference, [rows, cols], home_piece)
                     list_of_strategies.append(s)  # Add the strategy to our list of strategies
 
