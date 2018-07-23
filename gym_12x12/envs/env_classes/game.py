@@ -189,7 +189,7 @@ class Game:
             # self.game_is_on = False
             return True
 
-    def piece_surrounded_alt(self,row, col, adjacent_pieces = None):
+    def piece_surrounded_alt(self, row, col, adjacent_pieces=None):
 
         if not adjacent_pieces:
             surrounding_pieces = self.get_surrounding_pieces(row, col)
