@@ -295,7 +295,7 @@ class BotPlayer (Player):
             # if all else fails, we must pick a random empty spot
             return self.get_random_element(board_state.empty_spots)
         else:
-            pass
+            return self.get_random_element(board_state.empty_spots)
 
         return strat_return_move  # if this is [-1, -1] then there are literally no more spots left, game should complete
 

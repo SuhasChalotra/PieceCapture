@@ -101,11 +101,11 @@ class Game:
             return Game.GAME_MOVE_INVALID, blue_reward, red_reward
 
         if xloc < 0 or xloc > self.Board.COL_COUNT - 1:
-            print("x is out of range. x=", xloc)
+            print("x is out of range.", yloc, ",", xloc)
             return Game.GAME_MOVE_INVALID, blue_reward, red_reward
 
         if yloc < 0 or yloc > self.Board.ROW_COUNT - 1:
-            print("y is out of range. y=", yloc)
+            print("y is out of range.", yloc, ",", xloc)
             return Game.GAME_MOVE_INVALID, blue_reward, red_reward
 
         if self.Board.Grid[yloc, xloc] == Game.EMPTY:  # Empty slot to play
@@ -116,6 +116,7 @@ class Game:
             reward_results = self.reward_check(yloc, xloc)
             self.MoveNumber += 1  # Increment the score
             self.Board.empty_spots.remove((yloc, xloc))
+            print("removed ", yloc, ",", xloc, "empty moves left=", len(self.Board.empty_spots))
             return Game.GAME_MOVE_VALID,  reward_results[0], reward_results[1]
 
         else:
@@ -185,7 +186,7 @@ class Game:
         if len(self.Board.empty_spots) > 0:
             return False
         else:
-            self.game_is_on = False
+            # self.game_is_on = False
             return True
 
     def piece_surrounded_alt(self,row, col, adjacent_pieces = None):

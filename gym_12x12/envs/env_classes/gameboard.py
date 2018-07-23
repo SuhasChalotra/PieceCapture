@@ -46,13 +46,16 @@ class GameBoard:
         self.empty_spots = []
         self.board_size = self.ROW_COUNT * self.COL_COUNT
 
-        self._reset_empty_spots()  # reset the empty spot cash
+        self._reset_empty_spots()  # reset the empty spot cache
 
     def _reset_empty_spots(self):
         # Populate the empty spots list
-        for x in range(self.ROW_COUNT):
-            for y in range(self.COL_COUNT):
-                self.empty_spots.append((x, y))
+        self.empty_spots = []
+        for row in range(self.ROW_COUNT):
+            for col in range(self.COL_COUNT):
+                self.empty_spots.append((row, col))
+
+        print(len(self.empty_spots))
 
     def get_surrounding_pieces(self, row, col, diagonals=False):
         """
