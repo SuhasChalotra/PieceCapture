@@ -50,8 +50,8 @@ class HumanPlayer (Player):
     """
     A human player will be prompted to make its move via the keyboard input
     """
-    def __init__(self):
-        self.name = "Human"
+    def __init__(self, arg_name="default_human"):
+        self.name = arg_name
         pass
 
 
@@ -519,7 +519,7 @@ class Strategy:
 
     priority_level = 0  # holds the strategy priority level
     center = ()  # a strategy centers around a center tile of which we get the surrounding tiles, it will be a tuple
-    possible_plays = []  # this should be a list of x,y for possible plays in this strategy
+    possible_plays = []  # this should be a list of [y,x] (row, col) for possible plays in this strategy
     surrounding_tiles = []  # this should be a list of [y,x] co-ordinates (max 4, min 2) of tiles that surround the
     center
     """

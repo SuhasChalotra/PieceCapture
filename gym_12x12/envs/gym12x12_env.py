@@ -15,9 +15,10 @@ class gym12x12_env(gym.Env):
 
     def __init__(self):
         self.Game = None
-        self.CurrentPlayer = None
         self.action_space = None
         self.observation_space = None
+        self.AgentPlayer = None
+        self.NonAgentPlayer = None
 
     def step(self, action):
         """
@@ -29,10 +30,10 @@ class gym12x12_env(gym.Env):
         agent_master_reward_tally = 0
 
         # Agent makes a play. move_results results in true or false
-        move_results, p1_reward, p2_reward = self.Game.place_piece(self.CurrentPlayer, action[0], action[1])
-        if self.CurrentPlayer.piece_color == Game.BLUE_PIECE:
+        move_results, p1_reward, p2_reward = self.Game.place_piece(self.AgentPlayer, action[0], action[1])
+        if self.AgentPlayer.piece_color == Game.BLUE_PIECE:
             agent_master_reward_tally += p1_reward - p2_reward
-        elif self.CurrentPlayer.piece_color == Game.RED_PIECE:
+        elif self.AgentPlayer.piece_color == Game.RED_PIECE:
             agent_master_reward_tally += p2_reward - p1_reward
 
         done_flag = self.Game.is_game_complete()
@@ -42,21 +43,18 @@ class gym12x12_env(gym.Env):
             # We must abort the step function and return the reward_tally (which should be negative)
             return self.Game.Board, agent_master_reward_tally, done_flag, return_dict
 
-        self.alternate_player()  # switch players
-
         # Make a non-agent move
         if not done_flag:
             ob_grid, p1r, p2r = self.make_non_agent_move()
             # Calculate reward - we're essentially subtracting the agent's opponent's reward from the agent's
             # reward, thereby calculating the net reward for the agent
-            if self.CurrentPlayer.piece_color == Game.BLUE_PIECE:  # the non-agent is blue, subtract red from blue
+            if self.NonAgentPlayer.piece_color == Game.BLUE_PIECE:  # the non-agent is blue, subtract red from blue
                 agent_master_reward_tally += p2r - p1r
-            elif self.CurrentPlayer.piece_color == Game.RED_PIECE:  # the non-agent is red. subtract blue from red
+            elif self.NonAgentPlayer.piece_color == Game.RED_PIECE:  # the non-agent is red. subtract blue from red
                 agent_master_reward_tally += p1r - p2r
 
             done_flag = self.Game.is_game_complete()
 
-        # self.alternate_player()  # again, we alternate the player
         return self.Game.Board.Grid, agent_master_reward_tally, done_flag, return_dict
         #  observations, rewards, done, info
 
@@ -79,23 +77,25 @@ class gym12x12_env(gym.Env):
 
         self.Game.Board.clear()
         self.Game.start()
-        self.CurrentPlayer = self.Game.Player1  # Player 1 always starts
 
         # If the current player (player1) is not Agent, then we call our make non-agent move function and
         # get an initial observation with the non-agent move
-        if not isinstance(self.CurrentPlayer, AgentPlayer):
+        if not isinstance(self.Game.Player1, AgentPlayer):
+            self.NonAgentPlayer = self.Game.Player1  # Assign non agent player
+            self.AgentPlayer = self.Game.Player2  # Assign the agent
             # Call our make_non_agent_move method
             init_observation, p1r, p2r = self.make_non_agent_move()
             # Return an initial observation based on this move
-            print("Initial reset move ", self.CurrentPlayer.name)
-            self.alternate_player()
+            print("Initial reset move ", self.NonAgentPlayer.name)
+            # self.alternate_player()
 
             return init_observation
 
         else:
             # Essentially returning an empty board (and initial observation)
-            print("Initial reset move ", self.CurrentPlayer.name)
-            self.alternate_player()
+            self.NonAgentPlayer = self.Game.Player2  # Assign non agent player
+            self.AgentPlayer = self.Game.Player1  # Assign the agent
+            # self.alternate_player()
             return self.Game.Board, 0, 0
 
     def close(self):
@@ -108,18 +108,16 @@ class gym12x12_env(gym.Env):
         """
         :return: observation and reward
         """
-        if isinstance(self.CurrentPlayer, BotPlayer):
+        if isinstance(self.NonAgentPlayer, BotPlayer):
             # Check if it's bot
-            move = self.CurrentPlayer.get_ai_move(self.Game.Board)
+            move = self.NonAgentPlayer.get_ai_move(self.Game.Board)
             valid_m, p1_reward, p2_reward = self.Game.place_piece(self.CurrentPlayer, move[0], move[1])
 
             # We need to return an obs and reward
             return self.Game.Board, p1_reward, p2_reward
 
-        elif isinstance(self.CurrentPlayer, HumanPlayer):
+        if isinstance(self.NonAgentPlayer, HumanPlayer):
             # go in some input loop ensuring the Human player's input is valid
-            # self.alternate_player()
-
             pass
 
     @staticmethod
@@ -136,7 +134,7 @@ class gym12x12_env(gym.Env):
 
         elif player_type == PlayerType.AGENT:
 
-            return AgentPlayer()
+            return AgentPlayer(arg_name=argname)
 
         elif player_type == PlayerType.BOT:
             if dumb_bot_ai:

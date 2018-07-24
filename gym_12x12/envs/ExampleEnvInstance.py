@@ -13,7 +13,7 @@ for i_episode in range(1):
     obs = env.reset()
 
     while True:
-        print("Move by ", env.CurrentPlayer.name)
+        # print("Move by ", env.CurrentPlayer.name)
         action = env.CurrentPlayer.get_ai_move(obs)
         observation, reward, done, info = env.step(action)
         env.alternate_player()
