@@ -78,7 +78,7 @@ class gym12x12_env(gym.Env):
         self.Game.Board.clear()
         self.Game.start()
 
-        # If the current player (player1) is not Agent, then we call our make non-agent move function and
+        # If Player1 is not Agent, then we call our make non-agent move function and
         # get an initial observation with the non-agent move
         if not isinstance(self.Game.Player1, AgentPlayer):
             self.NonAgentPlayer = self.Game.Player1  # Assign non agent player
@@ -111,7 +111,7 @@ class gym12x12_env(gym.Env):
         if isinstance(self.NonAgentPlayer, BotPlayer):
             # Check if it's bot
             move = self.NonAgentPlayer.get_ai_move(self.Game.Board)
-            valid_m, p1_reward, p2_reward = self.Game.place_piece(self.CurrentPlayer, move[0], move[1])
+            valid_m, p1_reward, p2_reward = self.Game.place_piece(self.NonAgentPlayer, move[0], move[1])
 
             # We need to return an obs and reward
             return self.Game.Board, p1_reward, p2_reward
@@ -142,16 +142,6 @@ class gym12x12_env(gym.Env):
             else:
                 return BotPlayer(dumb_bot=dumb_bot_ai, arg_name=argname)
 
-    def alternate_player(self):
-        if self.CurrentPlayer == self.Game.Player1:
-            print("===ALTERNATE: Player was p1, now p2")
-            self.CurrentPlayer = self.Game.Player2
-        elif self.CurrentPlayer == self.Game.Player2:
-            print("===ALTERNATE: Player was p2, now p1")
-            self.CurrentPlayer = self.Game.Player1
-        else:
-            raise ValueError("Player alternation error")
-
     def initiate_game(self, arg_player1, arg_player2, arg_int_boardsize):
         # When the game is initialized we
         if not isinstance(arg_player1, Player):
@@ -161,7 +151,6 @@ class gym12x12_env(gym.Env):
             raise ValueError("Player 2 must be a player")
 
         self.Game = Game(arg_player1, arg_player2, rows=arg_int_boardsize, cols=arg_int_boardsize)
-        self.CurrentPlayer = self.Game.Player1
         self.action_space = spaces.Discrete(arg_int_boardsize * arg_int_boardsize)
         self.observation_space = spaces.Box(high=2, low=0, shape=[arg_int_boardsize, arg_int_boardsize], dtype=int)
 

@@ -1,5 +1,7 @@
 from gym_12x12.envs.env_classes.gameboard import GameBoard as gb
-from gym_12x12.envs.env_classes.player import Player, AgentPlayer, BotPlayer
+from gym_12x12.envs.env_classes.player import Player, AgentPlayer, BotPlayer, Strategy
+import time as tmr
+import sys as app
 
 
 class Game:
@@ -11,7 +13,7 @@ class Game:
     POINT_REWARD = 10
     INVALID_MOVE_PENALIZATION = -1
 
-    def __init__(self, player_1, player_2, rows=12, cols=12):
+    def __init__(self, player_1, player_2, rows=6, cols=6):
         """
         Initializes a new game.
         :param player_1: The blue player object
@@ -68,22 +70,17 @@ class Game:
         self.Player1.piece_color = Game.BLUE_PIECE
         self.Player2.piece_color = Game.RED_PIECE
 
-    def place_piece(self, arg_player: Player, yloc, xloc):
+    def place_piece(self, arg_player: Player, location):
         """
         This will place a player's piece in the game_board matrix
         :param arg_player: the player making the move
-        :param yloc: Rows (vertical)
-        :param xloc: Columns (horizontal)
+        :param location: [row, col] tuple or list containing two points
         :return: int, int_p1_pointScored, int_p2_pointScored
         """
         if not self.game_is_on:
             raise ValueError("Game has not started")
 
-        # if self.is_game_complete():
-        #     # Game is completed
-        #     self.game_is_on = False
-        #     return
-
+        yloc, xloc = location
         # yloc and xloc need to be within range and be valid integers
         if arg_player.piece_color == Game.BLUE_PIECE:
             blue_reward = Game.INVALID_MOVE_PENALIZATION
@@ -186,7 +183,6 @@ class Game:
         if len(self.Board.empty_spots) > 0:
             return False
         else:
-            # self.game_is_on = False
             return True
 
     def piece_surrounded_alt(self, row, col, adjacent_pieces=None):
@@ -225,3 +221,24 @@ class Game:
         elif col == (self.Board.COL_COUNT - 1): output.pop(2-row_checker)
 
         return output
+
+
+# Testing Space
+p1 = BotPlayer(arg_name="Bot_Player1")
+p2 = BotPlayer(arg_name="Bot_Player2")
+myGame = Game(p1, p2)
+
+myGame.start()
+print(len(myGame.Board.empty_spots))
+while not myGame.is_game_complete():
+    move = p1.get_ai_move(myGame.Board)
+    myGame.place_piece(p1, move)
+    myGame.print_game_board()
+    tmr.sleep(.3)
+    move = p2.get_ai_move(myGame.Board)
+    myGame.place_piece(p2, move)
+    myGame.print_game_board()
+    tmr.sleep(.5)
+
+print("Final score. Blue:", myGame.PlayerOneScore,  " Red:", myGame.PlayerTwoScore)
+app.exit()

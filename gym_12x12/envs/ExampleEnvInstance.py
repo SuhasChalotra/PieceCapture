@@ -14,9 +14,9 @@ for i_episode in range(1):
 
     while True:
         # print("Move by ", env.CurrentPlayer.name)
-        action = env.CurrentPlayer.get_ai_move(obs)
+        action = env.AgentPlayer.get_ai_move(obs)
         observation, reward, done, info = env.step(action)
-        env.alternate_player()
+
         env.render()
         tmr.sleep(float_game_speed_in_seconds)
 
