@@ -61,6 +61,7 @@ class Game:
         """
         self.PlayerOneScore = 0
         self.PlayerTwoScore = 0
+        self.MoveNumber = 0
         self.Board.clear()  # this should reset empty spots and clear the game board
 
     def __assign_player_piece_color(self):
@@ -226,19 +227,35 @@ class Game:
 # Testing Space
 p1 = BotPlayer(arg_name="Bot_Player1")
 p2 = BotPlayer(arg_name="Bot_Player2")
+execution_delay = 0
 myGame = Game(p1, p2)
+
+B_wins = 0
+R_wins = 0
+Ties = 0
 
 myGame.start()
 print(len(myGame.Board.empty_spots))
-while not myGame.is_game_complete():
-    move = p1.get_ai_move(myGame.Board)
-    myGame.place_piece(p1, move)
-    myGame.print_game_board()
-    tmr.sleep(.3)
-    move = p2.get_ai_move(myGame.Board)
-    myGame.place_piece(p2, move)
-    myGame.print_game_board()
-    tmr.sleep(.5)
+for episodes in range(0, 100):
+    while not myGame.is_game_complete():
+        move = p1.get_ai_move(myGame.Board)
+        myGame.place_piece(p1, move)
+        myGame.print_game_board()
+        tmr.sleep(execution_delay)
 
-print("Final score. Blue:", myGame.PlayerOneScore,  " Red:", myGame.PlayerTwoScore)
-app.exit()
+        move = p2.get_ai_move(myGame.Board)
+        myGame.place_piece(p2, move)
+        myGame.print_game_board()
+        tmr.sleep(execution_delay)
+
+    print("Final score. Blue:", myGame.PlayerOneScore,  " Red:", myGame.PlayerTwoScore)
+    if myGame.PlayerOneScore > myGame.PlayerTwoScore:
+        B_wins += 1
+    elif myGame.PlayerTwoScore > myGame.PlayerOneScore:
+        R_wins += 1
+    else:
+        Ties += 1
+    myGame.reset()
+print("blue wins", B_wins, "red wins", R_wins, " ties", Ties)
+
+
