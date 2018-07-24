@@ -663,7 +663,7 @@ class Strategy:
             if self.contains_count_of(self.surrounding_tiles, 0, arg_boardstate) > 0:
                 # Surrounding piece contains and empty space and not one of the defender's pieces
                 self.is_block_opportunity = True
-                print('Blocking status is true centered around', self.center)
+                # print('Blocking status is true centered around', self.center)
                 self.block_defender_player = target_color_at_center
                 self.block_priority_level = 5 - self.contains_count_of(self.surrounding_tiles, 0, arg_boardstate)
 

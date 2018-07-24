@@ -12,4 +12,6 @@ the same spot.
 Status: resolved - 07.22.2018 - 
 
 07.22.2018 - 002.00 - AI generally buggy. The scoring is too high. It should be more stalemate
-Status: open
+Resolution: moved the env.alternate_player() method until after the env.step(action) call
+
+Status: tenatively resolved -

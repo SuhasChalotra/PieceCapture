@@ -116,7 +116,7 @@ class Game:
             reward_results = self.reward_check(yloc, xloc)
             self.MoveNumber += 1  # Increment the score
             self.Board.empty_spots.remove((yloc, xloc))
-            print("removed ", yloc, ",", xloc, "empty moves left=", len(self.Board.empty_spots))
+
             return Game.GAME_MOVE_VALID,  reward_results[0], reward_results[1]
 
         else:
