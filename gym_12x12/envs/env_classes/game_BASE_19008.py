@@ -5,10 +5,10 @@ import sys as app
 
 
 class Game:
-    GAME_MOVE_INVALID = 0
-    GAME_MOVE_VALID = 1
+    GAME_MOVE_INVALID = -1
+    GAME_MOVE_VALID = 0
     EMPTY = 0
-    RED_PIECE = -1
+    RED_PIECE = 2
     BLUE_PIECE = 1
     POINT_REWARD = 10
     INVALID_MOVE_PENALIZATION = -1
@@ -48,9 +48,6 @@ class Game:
         # keep track of game running status
         self.game_is_on = False
 
-        # list of captured pieces
-        self.captured_pieces = set()
-
     def start(self):
         self.game_is_on = True
 
@@ -64,13 +61,7 @@ class Game:
         """
         self.PlayerOneScore = 0
         self.PlayerTwoScore = 0
-
-        self.Board.clear()
-        self.captured_pieces = set() # this should reset empty spots and clear the game board
-
-        self.MoveNumber = 0
         self.Board.clear()  # this should reset empty spots and clear the game board
-
 
     def __assign_player_piece_color(self):
         """
@@ -118,7 +109,7 @@ class Game:
             self.Board.Grid[yloc, xloc] = arg_player.piece_color
 
             # self.sweep_board()
-
+            print("Reward check on Move # ", self.MoveNumber, self.reward_check(yloc, xloc))
             reward_results = self.reward_check(yloc, xloc)
             self.MoveNumber += 1  # Increment the score
             self.Board.empty_spots.remove((yloc, xloc))
@@ -148,7 +139,6 @@ class Game:
 
         # First check if current piece is surrounded
         if self.piece_surrounded_alt(row, col, adjacent_pieces=surrounding_pieces):
-            self.captured_pieces.add((row, col))
             if self.Board.Grid[row, col] == Game.BLUE_PIECE:
                 int_red_reward_tally += Game.POINT_REWARD
                 self.PlayerTwoScore += 1
@@ -161,7 +151,6 @@ class Game:
             if self.Board.Grid[piece[0], piece[1]] == Game.EMPTY:
                 continue
             elif self.piece_surrounded_alt(piece[0], piece[1]):
-                self.captured_pieces.add((piece[0], piece[1]))
                 if self.Board.Grid[piece[0], piece[1]] == Game.BLUE_PIECE:
                     int_red_reward_tally += Game.POINT_REWARD
                     self.PlayerTwoScore += 1
@@ -233,59 +222,23 @@ class Game:
 
         return output
 
-# # Testing Space
-# p1 = BotPlayer(arg_name="Bot_Player1")
-# p2 = BotPlayer(arg_name="Bot_Player2")
-# myGame = Game(p1, p2)
-#
-# myGame.start()
-# print(len(myGame.Board.empty_spots))
-# while not myGame.is_game_complete():
-#     move = p1.get_ai_move(myGame.Board)
-#     myGame.place_piece(p1, move)
-#     myGame.print_game_board()
-#     tmr.sleep(.3)
-#     move = p2.get_ai_move(myGame.Board)
-#     myGame.place_piece(p2, move)
-#     myGame.print_game_board()
-#     tmr.sleep(.5)
-#
-# print("Final score. Blue:", myGame.PlayerOneScore,  " Red:", myGame.PlayerTwoScore)
-# app.exit()
-# =======
-# # Testing Space
-# p1 = BotPlayer(arg_name="Bot_Player1")
-# p2 = BotPlayer(arg_name="Bot_Player2")
-# execution_delay = 0
-# myGame = Game(p1, p2)
-#
-# B_wins = 0
-# R_wins = 0
-# Ties = 0
-#
-# myGame.start()
-# print(len(myGame.Board.empty_spots))
-# for episodes in range(0, 100):
-#     while not myGame.is_game_complete():
-#         move = p1.get_ai_move(myGame.Board)
-#         myGame.place_piece(p1, move)
-#         myGame.print_game_board()
-#         tmr.sleep(execution_delay)
-#
-#         move = p2.get_ai_move(myGame.Board)
-#         myGame.place_piece(p2, move)
-#         myGame.print_game_board()
-#         tmr.sleep(execution_delay)
-#
-#     print("Final score. Blue:", myGame.PlayerOneScore,  " Red:", myGame.PlayerTwoScore)
-#     if myGame.PlayerOneScore > myGame.PlayerTwoScore:
-#         B_wins += 1
-#     elif myGame.PlayerTwoScore > myGame.PlayerOneScore:
-#         R_wins += 1
-#     else:
-#         Ties += 1
-#     myGame.reset()
-# print("blue wins", B_wins, "red wins", R_wins, " ties", Ties)
-#
 
+# Testing Space
+p1 = BotPlayer(arg_name="Bot_Player1")
+p2 = BotPlayer(arg_name="Bot_Player2")
+myGame = Game(p1, p2)
 
+myGame.start()
+print(len(myGame.Board.empty_spots))
+while not myGame.is_game_complete():
+    move = p1.get_ai_move(myGame.Board)
+    myGame.place_piece(p1, move)
+    myGame.print_game_board()
+    tmr.sleep(.3)
+    move = p2.get_ai_move(myGame.Board)
+    myGame.place_piece(p2, move)
+    myGame.print_game_board()
+    tmr.sleep(.5)
+
+print("Final score. Blue:", myGame.PlayerOneScore,  " Red:", myGame.PlayerTwoScore)
+app.exit()
