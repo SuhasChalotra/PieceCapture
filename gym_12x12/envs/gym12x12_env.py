@@ -2,9 +2,14 @@ import gym
 from gym_12x12.envs.env_classes.player import Player, HumanPlayer, BotPlayer, AgentPlayer
 from gym_12x12.envs.env_classes.game import Game
 from gym import spaces
+import pygame
+
+MARGIN = 5
+BLOCK_SIZE = 30
 
 
 class PlayerType:
+
 
     HUMAN = 2
     AGENT = 1
@@ -19,6 +24,8 @@ class gym12x12_env(gym.Env):
         self.observation_space = None
         self.AgentPlayer = None
         self.NonAgentPlayer = None
+        self.screen = None
+
 
     def step(self, action):
         """
@@ -30,7 +37,7 @@ class gym12x12_env(gym.Env):
         agent_master_reward_tally = 0
 
         # Agent makes a play. move_results results in true or false
-        move_results, p1_reward, p2_reward = self.Game.place_piece(self.AgentPlayer, action[0], action[1])
+        move_results, p1_reward, p2_reward = self.Game.place_piece(self.AgentPlayer, (action[0], action[1]))
         if self.AgentPlayer.piece_color == Game.BLUE_PIECE:
             agent_master_reward_tally += p1_reward - p2_reward
         elif self.AgentPlayer.piece_color == Game.RED_PIECE:
@@ -39,9 +46,9 @@ class gym12x12_env(gym.Env):
         done_flag = self.Game.is_game_complete()
         return_dict = []
 
-        if not move_results or done_flag:
+        if (not move_results) or done_flag:
             # We must abort the step function and return the reward_tally (which should be negative)
-            return self.Game.Board, agent_master_reward_tally, done_flag, return_dict
+            return self.Game.Board.Grid, agent_master_reward_tally, done_flag, return_dict
 
         # Make a non-agent move
         if not done_flag:
@@ -55,11 +62,12 @@ class gym12x12_env(gym.Env):
 
             done_flag = self.Game.is_game_complete()
 
-        return self.Game.Board.Grid, agent_master_reward_tally, done_flag, return_dict
+        return self.Game.Board, agent_master_reward_tally, done_flag, return_dict
         #  observations, rewards, done, info
 
-    def render(self):
-        self.Game.print_game_board()  # Prints the game board
+    def render(self, mode='human'):
+        self.draw_grid(self.Game.Board.Grid)
+        pygame.display.flip()
 
     def reset(self):
         """
@@ -75,7 +83,7 @@ class gym12x12_env(gym.Env):
         if self.action_space is None or self.observation_space is None:
             raise ValueError("Game not propely initiated. Check action or observation spaces")
 
-        self.Game.Board.clear()
+        self.Game.reset()
         self.Game.start()
 
         # If Player1 is not Agent, then we call our make non-agent move function and
@@ -111,13 +119,31 @@ class gym12x12_env(gym.Env):
         if isinstance(self.NonAgentPlayer, BotPlayer):
             # Check if it's bot
             move = self.NonAgentPlayer.get_ai_move(self.Game.Board)
-            valid_m, p1_reward, p2_reward = self.Game.place_piece(self.NonAgentPlayer, move[0], move[1])
+            valid_m, p1_reward, p2_reward = self.Game.place_piece(self.NonAgentPlayer, (move[0], move[1]))
 
             # We need to return an obs and reward
             return self.Game.Board, p1_reward, p2_reward
 
         if isinstance(self.NonAgentPlayer, HumanPlayer):
-            # go in some input loop ensuring the Human player's input is valid
+            move = None
+
+            while move is None:
+                move = pygame.event.wait()
+                if move.type == pygame.MOUSEBUTTONDOWN:
+                    x, y = move.pos // (MARGIN + BLOCK_SIZE)
+                    valid_m, p1_reward, p2_reward = self.Game.place_piece(self.NonAgentPlayer, (x, y))
+
+                if not valid_m:
+                    move = None
+
+                else:
+                    return self.Game.Board, p1_reward, p2_reward
+
+
+
+
+
+            
             pass
 
     @staticmethod
@@ -153,6 +179,33 @@ class gym12x12_env(gym.Env):
         self.Game = Game(arg_player1, arg_player2, rows=arg_int_boardsize, cols=arg_int_boardsize)
         self.action_space = spaces.Discrete(arg_int_boardsize * arg_int_boardsize)
         self.observation_space = spaces.Box(high=2, low=0, shape=[arg_int_boardsize, arg_int_boardsize], dtype=int)
+
+        # Initialize pygame and set Screen size
+        pygame.init()
+        screen_size = (MARGIN + BLOCK_SIZE)* arg_int_boardsize + MARGIN
+
+        self.screen = pygame.display.set_mode((screen_size, screen_size))
+        self.screen.fill((0, 0, 0))
+
+    def draw_grid(self, grid):
+
+        for col in range(self.Game.Board.COL_COUNT):
+            for row in range(self.Game.Board.ROW_COUNT):
+                y = (MARGIN + BLOCK_SIZE) * col + MARGIN
+                x = (MARGIN + BLOCK_SIZE) * row + MARGIN
+
+                if (col, row) in self.Game.captured_pieces:
+                    pygame.draw.rect(self.screen, (0, 0, 0), (x, y, BLOCK_SIZE, BLOCK_SIZE))
+                else:
+                    pygame.draw.rect(self.screen, (255, 255, 255), (x, y, BLOCK_SIZE, BLOCK_SIZE))
+
+                if grid[col, row] == Game.BLUE_PIECE:
+                    pygame.draw.circle(self.screen, (0, 0, 255), (x + BLOCK_SIZE//2, y + BLOCK_SIZE//2), BLOCK_SIZE//2)
+
+                elif grid[col, row] == Game.RED_PIECE:
+                    pygame.draw.circle(self.screen, (255, 0, 0),  (x + BLOCK_SIZE//2, y + BLOCK_SIZE//2), BLOCK_SIZE//2)
+
+
 
 
 

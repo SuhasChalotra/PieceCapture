@@ -39,8 +39,8 @@ class Player (ABC):
         :return: the opposite piece color to the player
         """
         if self.piece_color == 1:
-            return 2
-        elif self.piece_color == 2:
+            return -1
+        elif self.piece_color == -1:
             return 1
         else:
             return 0  # Invalid
@@ -84,6 +84,7 @@ class BotPlayer (Player):
         # which means it will pick a random move, instead of doing the smart AI logic (if false)
         if self.dumb_bot_logic:
             print("Dumb bot logic move made!")
+            print(arg_game_board_reference)
             return self.get_random_element(arg_game_board_reference.empty_spots)
 
         # this is the master list of all strategies from which we can pull out different sub-strategies
@@ -773,8 +774,8 @@ class Strategy:
         :return: the opposite piece color to the player
         """
         if arg_in_color == 1:
-            return 2
-        elif arg_in_color == 2:
+            return -1
+        elif arg_in_color == -1:
             return 1
         else:
             raise ValueError("Invalid piece color.")
