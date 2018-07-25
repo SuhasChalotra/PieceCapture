@@ -119,7 +119,7 @@ class GameBoard:
 
     def get_count_of(self, piece_color, in_list):
         """
-        :param piece_color: 0, 1 or 2 - the items we are looking for
+        :param piece_color: 1, -1 or 2 - the items we are looking for
         :param in_list: a list
         :return: returns an integer containing the amount of times piece_color appears in the array
         """

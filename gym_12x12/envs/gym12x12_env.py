@@ -9,8 +9,6 @@ BLOCK_SIZE = 30
 
 
 class PlayerType:
-
-
     HUMAN = 2
     AGENT = 1
     BOT = 0
@@ -25,7 +23,6 @@ class gym12x12_env(gym.Env):
         self.AgentPlayer = None
         self.NonAgentPlayer = None
         self.screen = None
-
 
     def step(self, action):
         """
@@ -48,7 +45,7 @@ class gym12x12_env(gym.Env):
 
         if (not move_results) or done_flag:
             # We must abort the step function and return the reward_tally (which should be negative)
-            return self.Game.Board.Grid, agent_master_reward_tally, done_flag, return_dict
+            return self.Game.Board, agent_master_reward_tally, done_flag, return_dict
 
         # Make a non-agent move
         if not done_flag:
@@ -138,12 +135,6 @@ class gym12x12_env(gym.Env):
 
                 else:
                     return self.Game.Board, p1_reward, p2_reward
-
-
-
-
-
-            
             pass
 
     @staticmethod
@@ -178,7 +169,7 @@ class gym12x12_env(gym.Env):
 
         self.Game = Game(arg_player1, arg_player2, rows=arg_int_boardsize, cols=arg_int_boardsize)
         self.action_space = spaces.Discrete(arg_int_boardsize * arg_int_boardsize)
-        self.observation_space = spaces.Box(high=2, low=0, shape=[arg_int_boardsize, arg_int_boardsize], dtype=int)
+        self.observation_space = spaces.Box(high=2, low=-1, shape=[arg_int_boardsize, arg_int_boardsize], dtype=int)
 
         # Initialize pygame and set Screen size
         pygame.init()
@@ -190,6 +181,7 @@ class gym12x12_env(gym.Env):
     def draw_grid(self, grid):
 
         for col in range(self.Game.Board.COL_COUNT):
+            pygame.event.get()
             for row in range(self.Game.Board.ROW_COUNT):
                 y = (MARGIN + BLOCK_SIZE) * col + MARGIN
                 x = (MARGIN + BLOCK_SIZE) * row + MARGIN
@@ -205,6 +197,7 @@ class gym12x12_env(gym.Env):
                 elif grid[col, row] == Game.RED_PIECE:
                     pygame.draw.circle(self.screen, (255, 0, 0),  (x + BLOCK_SIZE//2, y + BLOCK_SIZE//2), BLOCK_SIZE//2)
 
+                pygame.event.get()
 
 
 

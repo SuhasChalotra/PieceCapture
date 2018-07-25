@@ -646,7 +646,7 @@ class Strategy:
         target_color_at_center = arg_boardstate.Grid[row, col]  # Get the piece color a the center (target)
 
         if not target_color_at_center == 0:
-            #  if the piece color at center isn't 'empty', then we can get the opposite color (1 -> 2, 2 -> 1)
+            #  if the piece color at center isn't 'empty', then we can get the opposite color (1 -> -1, -1 -> 1)
             aggressor = self.get_opp_color(target_color_at_center)
         else:
             # write it off as not an opportunity
