@@ -5,7 +5,7 @@ import time as tmr
 env = gym12x12_env()
 
 player_one = env.create_player(pt.BOT, dumb_bot_ai=True, argname="bot1")
-player_two = env.create_player(pt.BOT, dumb_bot_ai=True, argname="bot2")
+player_two = env.create_player(pt.BOT, dumb_bot_ai=False, argname="bot2")
 env.initiate_game(arg_player1=player_one, arg_player2=player_two, arg_int_boardsize=6)
 float_game_speed_in_seconds = 1
 

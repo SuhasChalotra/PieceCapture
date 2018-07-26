@@ -2,6 +2,7 @@ import gym
 from gym_12x12.envs.env_classes.player import Player, HumanPlayer, BotPlayer, AgentPlayer
 from gym_12x12.envs.env_classes.game import Game
 from gym import spaces
+import random as rnd
 import pygame
 
 MARGIN = 5
@@ -93,7 +94,7 @@ class gym12x12_env(gym.Env):
             # Return an initial observation based on this move
             print("Initial reset move ", self.NonAgentPlayer.name)
             # self.alternate_player()
-
+            self.Game.print_game_board()
             return init_observation
 
         else:
@@ -101,6 +102,7 @@ class gym12x12_env(gym.Env):
             self.NonAgentPlayer = self.Game.Player2  # Assign non agent player
             self.AgentPlayer = self.Game.Player1  # Assign the agent
             # self.alternate_player()
+            self.Game.print_game_board()
             return self.Game.Board, 0, 0
 
     def close(self):
@@ -108,6 +110,25 @@ class gym12x12_env(gym.Env):
 
     def seed(self, seed=None):
         pass
+
+    def make_agent_move(self):
+        """
+        agent move will make a random move
+        :return: observation and reward
+        """
+
+    def _get_random_empty_move(self):
+        """
+        This function returns a random spot to play from the Game.Board.empty_spaces property
+        :empty_move_list: the cached list of available moves
+        :return: [row,col]
+        """
+
+        if len(self.Game.Board.empty_move_list) > 0:
+            choice = rnd(0, len(self.Game.Board.empty_move_list) - 1)
+            return self.Game.Board.empty_move_list[choice]
+        else:
+            return -1, -1  # Signifies that there are no empty moves left
 
     def make_non_agent_move(self):
         """
@@ -119,7 +140,7 @@ class gym12x12_env(gym.Env):
             valid_m, p1_reward, p2_reward = self.Game.place_piece(self.NonAgentPlayer, (move[0], move[1]))
 
             # We need to return an obs and reward
-            return self.Game.Board, p1_reward, p2_reward
+            return self.Game.Board.Grid, p1_reward, p2_reward
 
         if isinstance(self.NonAgentPlayer, HumanPlayer):
             move = None
@@ -134,7 +155,7 @@ class gym12x12_env(gym.Env):
                     move = None
 
                 else:
-                    return self.Game.Board, p1_reward, p2_reward
+                    return self.Game.Board.Grid, p1_reward, p2_reward
             pass
 
     @staticmethod
@@ -155,9 +176,9 @@ class gym12x12_env(gym.Env):
 
         elif player_type == PlayerType.BOT:
             if dumb_bot_ai:
-                return BotPlayer(dumb_bot=dumb_bot_ai, arg_name=argname)
+                return BotPlayer(bot_name=argname)
             else:
-                return BotPlayer(dumb_bot=dumb_bot_ai, arg_name=argname)
+                return BotPlayer(bot_name=argname)
 
     def initiate_game(self, arg_player1, arg_player2, arg_int_boardsize):
         # When the game is initialized we

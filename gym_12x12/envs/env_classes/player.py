@@ -65,14 +65,13 @@ class BotPlayer (Player):
     """
     An AI Player
     """
-    def __init__(self, dumb_bot=False, arg_name="default_bot"):
+    def __init__(self, bot_name="default_bot"):
         """
 
         :param dumb_bot: when set to true, bot makes random moves instead of smart AI moves
         """
-        self.name = arg_name
+        self.name = bot_name
         self.enable_white_space_strategy = True  # for use in the bot AI logic
-        self.dumb_bot_logic = dumb_bot
 
     def get_ai_move(self, arg_game_board_reference):
         """
@@ -82,10 +81,6 @@ class BotPlayer (Player):
 
         # Let's first determine if this AI Bot instance has the dumb_bot_logic flag turned on (true)
         # which means it will pick a random move, instead of doing the smart AI logic (if false)
-        if self.dumb_bot_logic:
-            print("Dumb bot logic move made!")
-            print(arg_game_board_reference)
-            return self.get_random_element(arg_game_board_reference.empty_spots)
 
         # this is the master list of all strategies from which we can pull out different sub-strategies
         # and boardstate assessments
