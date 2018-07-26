@@ -579,13 +579,14 @@ class Strategy:
         list_of_strategies = []  # Blank List of all possible strategies centered around a  at [rows, cols]
 
         if isinstance(arg_game_board_reference, GameBoard):
-            for rows in range(0, len(arg_game_board_reference.Grid)):
+            for rows in range(0, arg_game_board_reference.ROW_COUNT):
                 for cols in range(0, arg_game_board_reference.COL_COUNT):
                     s = Strategy(arg_game_board_reference, [rows, cols], home_piece)
                     list_of_strategies.append(s)  # Add the strategy to our list of strategies
 
             print("Total number of list_of_strategies", len(list_of_strategies))
         else:
+            print(arg_game_board_reference)
             raise ValueError("Invalid gameboard state")
 
         return list_of_strategies

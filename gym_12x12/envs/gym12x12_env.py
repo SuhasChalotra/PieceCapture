@@ -140,7 +140,7 @@ class gym12x12_env(gym.Env):
             valid_m, p1_reward, p2_reward = self.Game.place_piece(self.NonAgentPlayer, (move[0], move[1]))
 
             # We need to return an obs and reward
-            return self.Game.Board.Grid, p1_reward, p2_reward
+            return self.Game.Board, p1_reward, p2_reward
 
         if isinstance(self.NonAgentPlayer, HumanPlayer):
             move = None
@@ -155,7 +155,7 @@ class gym12x12_env(gym.Env):
                     move = None
 
                 else:
-                    return self.Game.Board.Grid, p1_reward, p2_reward
+                    return self.Game.Board, p1_reward, p2_reward
             pass
 
     @staticmethod
