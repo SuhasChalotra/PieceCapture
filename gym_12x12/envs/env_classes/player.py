@@ -65,14 +65,14 @@ class BotPlayer (Player):
     """
     An AI Player
     """
-    def __init__(self, bot_name="default_bot", arg_dumb=True):
+    def __init__(self, bot_name="default_bot", arg_smart_ai=False):
         """
 
         :param dumb_bot: when set to true, bot makes random moves instead of smart AI moves
         """
         self.name = bot_name
         self.enable_white_space_strategy = True  # for use in the bot AI logic
-        self.is_dumb = arg_dumb
+        self.smart_ai = arg_smart_ai
 
     def get_ai_move(self, arg_game_board_reference):
         """

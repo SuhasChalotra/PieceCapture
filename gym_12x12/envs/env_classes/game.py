@@ -126,7 +126,7 @@ class Game:
             return Game.GAME_MOVE_VALID,  reward_results[0], reward_results[1]
 
         else:
-            print(yloc, xloc, " is an Invalid move. Try again.")
+            # print(yloc, xloc, " is an Invalid move. Try again.")
             return Game.GAME_MOVE_INVALID, blue_reward, red_reward
 
     def print_game_board(self):

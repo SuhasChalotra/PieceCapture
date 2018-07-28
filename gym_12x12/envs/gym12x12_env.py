@@ -112,12 +112,6 @@ class gym12x12_env(gym.Env):
     def seed(self, seed=None):
         pass
 
-    def make_agent_move(self):
-        """
-        agent move will make a random move
-        :return: observation and reward
-        """
-
     def get_smart_move(self):
         return self.NonAgentPlayer.get_ai_move(self.Game.Board)
 
@@ -139,8 +133,8 @@ class gym12x12_env(gym.Env):
         :return: observation and reward
         """
         if isinstance(self.NonAgentPlayer, BotPlayer):
-            # Check if it's bot
-            if self.NonAgentPlayer.is_dumb:
+            # Check if we're using smart or dumb strategies
+            if not self.NonAgentPlayer.smart_ai:
                 move = self.get_dumb_move()
             else:
                 move = self.get_smart_move()
@@ -161,7 +155,7 @@ class gym12x12_env(gym.Env):
                 if move.type == pygame.MOUSEBUTTONDOWN:
                     y, x = move.pos
                     y, x = y // (MARGIN + BLOCK_SIZE), x // (MARGIN + BLOCK_SIZE)
-                    valid_m, p1_reward, p2_reward = self.Game.place_piece(self.NonAgentPlayer, (x, y))
+                    valid_m, p1_reward, p2_reward = self.Game.place_piece(self.NonAgentPlayer, (y, x))  # TODO There is a mistake here (it was x,y), changed to (y,x)
 
                 if not valid_m:
                     move = None
@@ -171,9 +165,9 @@ class gym12x12_env(gym.Env):
             pass
 
     @staticmethod
-    def create_player(player_type, argname, dumb_bot_ai=True):
+    def create_player(player_type, argname, smart_ai=False):
         """
-        :param dumb_bot_ai: Only applies to type Bot: True = use random move strategy, false = use smart AI algorithm
+        :param smart_ai: Only applies to type Bot: True = Use smart AI (hard coded algo), false = use random move (dumb)
         :param player_type: Specify either a player or an AI
         :param argname: friendly name
         :return: returns the requested player type
@@ -187,8 +181,7 @@ class gym12x12_env(gym.Env):
             return AgentPlayer(arg_name=argname)
 
         elif player_type == PlayerType.BOT:
-            return BotPlayer(bot_name=argname, arg_dumb=dumb_bot_ai)
-
+            return BotPlayer(bot_name=argname, arg_smart_ai=smart_ai)
 
     def initiate_game(self, arg_player1, arg_player2, arg_int_boardsize):
         # When the game is initialized we
@@ -200,7 +193,6 @@ class gym12x12_env(gym.Env):
 
         self.Game = Game(arg_player1, arg_player2, rows=arg_int_boardsize, cols=arg_int_boardsize)
         self.action_space = spaces.Discrete(arg_int_boardsize * arg_int_boardsize)
-
 
         self.observation_space = spaces.Box(high=2, low=-1, shape=[arg_int_boardsize, arg_int_boardsize], dtype=int)
 
