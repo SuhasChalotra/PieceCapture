@@ -14,7 +14,7 @@ for i_episode in range(2):
     done = None
     i = 0
     while not done:
-        action = env.AgentPlayer.get_ai_move(obs)
+        action = env.get_dumb_move()
         obs, reward, done, info = env.step(action)
         env.Game.print_game_board()
         env.render()

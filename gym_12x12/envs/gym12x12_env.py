@@ -65,6 +65,7 @@ class gym12x12_env(gym.Env):
 
     def render(self, mode='human'):
         self.draw_grid(self.Game.Board.Grid)
+        pygame.event.get()
         pygame.display.flip()
 
     def reset(self):
@@ -117,16 +118,19 @@ class gym12x12_env(gym.Env):
         :return: observation and reward
         """
 
-    def _get_random_empty_move(self):
+    def get_smart_move(self):
+        return BotPlayer().get_ai_move(self.Game.Board)
+
+    def get_dumb_move(self):
         """
         This function returns a random spot to play from the Game.Board.empty_spaces property
         :empty_move_list: the cached list of available moves
         :return: [row,col]
         """
 
-        if len(self.Game.Board.empty_move_list) > 0:
-            choice = rnd(0, len(self.Game.Board.empty_move_list) - 1)
-            return self.Game.Board.empty_move_list[choice]
+        if len(self.Game.Board.empty_spots) > 0:
+            choice = rnd.randint(0, len(self.Game.Board.empty_spots) - 1)
+            return self.Game.Board.empty_spots[choice]
         else:
             return -1, -1  # Signifies that there are no empty moves left
 
@@ -202,7 +206,6 @@ class gym12x12_env(gym.Env):
     def draw_grid(self, grid):
 
         for col in range(self.Game.Board.COL_COUNT):
-            pygame.event.get()
             for row in range(self.Game.Board.ROW_COUNT):
                 y = (MARGIN + BLOCK_SIZE) * col + MARGIN
                 x = (MARGIN + BLOCK_SIZE) * row + MARGIN
@@ -217,8 +220,6 @@ class gym12x12_env(gym.Env):
 
                 elif grid[col, row] == Game.RED_PIECE:
                     pygame.draw.circle(self.screen, (255, 0, 0),  (x + BLOCK_SIZE//2, y + BLOCK_SIZE//2), BLOCK_SIZE//2)
-
-                pygame.event.get()
 
 
 
