@@ -46,7 +46,7 @@ class gym12x12_env(gym.Env):
 
         if (not move_results) or done_flag:
             # We must abort the step function and return the reward_tally (which should be negative)
-            return self.Game.Board, agent_master_reward_tally, done_flag, return_dict
+            return self.Game.Board.Grid, agent_master_reward_tally, done_flag, return_dict
 
         # Make a non-agent move
         if not done_flag:
@@ -60,7 +60,7 @@ class gym12x12_env(gym.Env):
 
             done_flag = self.Game.is_game_complete()
 
-        return self.Game.Board, agent_master_reward_tally, done_flag, return_dict
+        return self.Game.Board.Grid, agent_master_reward_tally, done_flag, return_dict
         #  observations, rewards, done, info
 
     def render(self, mode='human'):
@@ -93,9 +93,9 @@ class gym12x12_env(gym.Env):
             # Call our make_non_agent_move method
             init_observation, p1r, p2r = self.make_non_agent_move()
             # Return an initial observation based on this move
-            print("Initial reset move ", self.NonAgentPlayer.name)
+
             # self.alternate_player()
-            self.Game.print_game_board()
+            # self.Game.print_game_board()
             return init_observation
 
         else:
@@ -103,8 +103,8 @@ class gym12x12_env(gym.Env):
             self.NonAgentPlayer = self.Game.Player2  # Assign non agent player
             self.AgentPlayer = self.Game.Player1  # Assign the agent
             # self.alternate_player()
-            self.Game.print_game_board()
-            return self.Game.Board, 0, 0
+
+            return self.Game.Board.Grid, 0, 0
 
     def close(self):
         pass
@@ -119,7 +119,7 @@ class gym12x12_env(gym.Env):
         """
 
     def get_smart_move(self):
-        return BotPlayer().get_ai_move(self.Game.Board)
+        return self.NonAgentPlayer.get_ai_move(self.Game.Board)
 
     def get_dumb_move(self):
         """
@@ -140,7 +140,11 @@ class gym12x12_env(gym.Env):
         """
         if isinstance(self.NonAgentPlayer, BotPlayer):
             # Check if it's bot
-            move = self.NonAgentPlayer.get_ai_move(self.Game.Board)
+            if self.NonAgentPlayer.is_dumb:
+                move = self.get_dumb_move()
+            else:
+                move = self.get_smart_move()
+
             valid_m, p1_reward, p2_reward = self.Game.place_piece(self.NonAgentPlayer, (move[0], move[1]))
 
             # We need to return an obs and reward
@@ -150,9 +154,13 @@ class gym12x12_env(gym.Env):
             move = None
 
             while move is None:
+                self.render()
                 move = pygame.event.wait()
+                valid_m = Game.GAME_MOVE_INVALID
+
                 if move.type == pygame.MOUSEBUTTONDOWN:
-                    x, y = move.pos // (MARGIN + BLOCK_SIZE)
+                    y, x = move.pos
+                    y, x = y // (MARGIN + BLOCK_SIZE), x // (MARGIN + BLOCK_SIZE)
                     valid_m, p1_reward, p2_reward = self.Game.place_piece(self.NonAgentPlayer, (x, y))
 
                 if not valid_m:
@@ -179,10 +187,8 @@ class gym12x12_env(gym.Env):
             return AgentPlayer(arg_name=argname)
 
         elif player_type == PlayerType.BOT:
-            if dumb_bot_ai:
-                return BotPlayer(bot_name=argname)
-            else:
-                return BotPlayer(bot_name=argname)
+            return BotPlayer(bot_name=argname, arg_dumb=dumb_bot_ai)
+
 
     def initiate_game(self, arg_player1, arg_player2, arg_int_boardsize):
         # When the game is initialized we
@@ -194,6 +200,8 @@ class gym12x12_env(gym.Env):
 
         self.Game = Game(arg_player1, arg_player2, rows=arg_int_boardsize, cols=arg_int_boardsize)
         self.action_space = spaces.Discrete(arg_int_boardsize * arg_int_boardsize)
+
+
         self.observation_space = spaces.Box(high=2, low=-1, shape=[arg_int_boardsize, arg_int_boardsize], dtype=int)
 
         # Initialize pygame and set Screen size
@@ -201,7 +209,13 @@ class gym12x12_env(gym.Env):
         screen_size = (MARGIN + BLOCK_SIZE)* arg_int_boardsize + MARGIN
 
         self.screen = pygame.display.set_mode((screen_size, screen_size))
+
         self.screen.fill((0, 0, 0))
+
+    def from_int_to_tuple(self, arg_int):
+        row = arg_int // self.Game.Board.ROW_COUNT
+        col = arg_int % self.Game.Board.ROW_COUNT
+        return tuple([row, col])
 
     def draw_grid(self, grid):
 
@@ -220,7 +234,6 @@ class gym12x12_env(gym.Env):
 
                 elif grid[col, row] == Game.RED_PIECE:
                     pygame.draw.circle(self.screen, (255, 0, 0),  (x + BLOCK_SIZE//2, y + BLOCK_SIZE//2), BLOCK_SIZE//2)
-
 
 
 

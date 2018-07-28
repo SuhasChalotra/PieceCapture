@@ -55,7 +55,7 @@ class GameBoard:
             for col in range(self.COL_COUNT):
                 self.empty_spots.append((row, col))
 
-        print(len(self.empty_spots))
+
 
     def get_surrounding_pieces(self, row, col, diagonals=False):
         """

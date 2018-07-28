@@ -65,13 +65,14 @@ class BotPlayer (Player):
     """
     An AI Player
     """
-    def __init__(self, bot_name="default_bot"):
+    def __init__(self, bot_name="default_bot", arg_dumb=True):
         """
 
         :param dumb_bot: when set to true, bot makes random moves instead of smart AI moves
         """
         self.name = bot_name
         self.enable_white_space_strategy = True  # for use in the bot AI logic
+        self.is_dumb = arg_dumb
 
     def get_ai_move(self, arg_game_board_reference):
         """
@@ -137,7 +138,7 @@ class BotPlayer (Player):
                 strat_return_move = pt_scoring[int_pick].scoring_move
 
                 if not self.will_move_endanger_player(strat_return_move, board_state):
-                    print("Point scoring strategy taken")
+                    # print("Point scoring strategy taken")
                     return strat_return_move
                 else:
                     try_count += 1
@@ -151,21 +152,21 @@ class BotPlayer (Player):
                 int_pick = randint(0, len(L4) - 1)
                 r_pick = randint(0, len(L4[int_pick].possible_moves) - 1)
                 strat_return_move = L4[int_pick].possible_moves[r_pick]
-                print("Lvl 4 Point block strategy taken")
+                # print("Lvl 4 Point block strategy taken")
                 return strat_return_move
 
             if len(L3) > 0:
                 int_pick = randint(0, len(L3) - 1)
                 r_pick = randint(0, len(L3[int_pick].possible_moves) - 1)
                 strat_return_move = L3[int_pick].possible_moves[r_pick]
-                print("Lvl 3 Point block strategy taken")
+                # print("Lvl 3 Point block strategy taken")
                 return strat_return_move
 
             if len(L2) > 0:
                 int_pick = randint(0, len(L2) - 1)
                 r_pick = randint(0, len(L2[int_pick].possible_moves) - 1)
                 strat_return_move = L2[int_pick].possible_moves[r_pick]
-                print("Lvl 2 Point block strategy taken")
+                # print("Lvl 2 Point block strategy taken")
                 return strat_return_move
 
         # 3) White space defensive block strategies
@@ -182,7 +183,7 @@ class BotPlayer (Player):
                         list_considered_move = strat.possible_moves[int_pick]
 
                         if not self.will_move_endanger_player(list_considered_move, board_state):
-                            print("White space defensive block strategy chosen")
+                            # print("White space defensive block strategy chosen")
                             return list_considered_move
                         else:
                             int_count += 1
@@ -217,7 +218,7 @@ class BotPlayer (Player):
 
                         if int_target_index >= 0:
                             ws_return_move = self.get_random_element(selected_advanced_strategies[int_target_index].possible_moves_diagonal)
-                            print("White space advanced off strategy chosen")
+                            # print("White space advanced off strategy chosen")
                             return ws_return_move
 
             # No advanced white space strategies were found, so continue on with point building strategies
@@ -234,7 +235,7 @@ class BotPlayer (Player):
                     move_choice = self.get_random_element(L4[int_pb_pick].possible_moves) # this is a tuple
                     # make sure the move won't endanger the AI
                     if not self.will_move_endanger_player(move_choice, board_state) and not self.will_move_spoil_white_space_strat(move_choice, board_state):
-                        print("Level 4 Point building strategy taken")
+                        # print("Level 4 Point building strategy taken")
                         return move_choice
                     else:
                         int_count_break += 1
@@ -249,7 +250,7 @@ class BotPlayer (Player):
                     move_choice = self.get_random_element(L3[int_pb_pick].possible_moves)  # this is a tuple
                     # make sure the move won't endanger the AI
                     if not self.will_move_endanger_player(move_choice, board_state) and not self.will_move_spoil_white_space_strat(move_choice, board_state):
-                        print("Level 3 Point building strategy taken")
+                        # print("Level 3 Point building strategy taken")
                         return move_choice
                     else:
                         int_count_break += 1
@@ -584,7 +585,6 @@ class Strategy:
                     s = Strategy(arg_game_board_reference, [rows, cols], home_piece)
                     list_of_strategies.append(s)  # Add the strategy to our list of strategies
 
-            print("Total number of list_of_strategies", len(list_of_strategies))
         else:
             print(arg_game_board_reference)
             raise ValueError("Invalid gameboard state")
