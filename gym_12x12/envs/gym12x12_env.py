@@ -4,6 +4,7 @@ from gym_12x12.envs.env_classes.game import Game
 from gym import spaces
 import random as rnd
 import pygame
+import warnings
 
 MARGIN = 5
 BLOCK_SIZE = 30
@@ -16,6 +17,10 @@ class PlayerType:
 
 
 class gym12x12_env(gym.Env):
+    GAME_TYPE_AGENT_V_BOT = 0
+    GAME_TYPE_AGENT_V_HUMAN = 1
+    GAME_TYPE_BOT_V_BOT = 2
+    GAME_TYPE_BOT_V_HUMAN = 3
 
     def __init__(self):
         self.Game = None
@@ -24,6 +29,7 @@ class gym12x12_env(gym.Env):
         self.AgentPlayer = None
         self.NonAgentPlayer = None
         self.screen = None
+        self.GameType = None
 
     def step(self, action):
         """
@@ -87,24 +93,25 @@ class gym12x12_env(gym.Env):
 
         # If Player1 is not Agent, then we call our make non-agent move function and
         # get an initial observation with the non-agent move
-        if not isinstance(self.Game.Player1, AgentPlayer):
-            self.NonAgentPlayer = self.Game.Player1  # Assign non agent player
-            self.AgentPlayer = self.Game.Player2  # Assign the agent
-            # Call our make_non_agent_move method
-            init_observation, p1r, p2r = self.make_non_agent_move()
-            # Return an initial observation based on this move
+        if self.GameType == self.GAME_TYPE_AGENT_V_BOT or self.GameType == self.GAME_TYPE_AGENT_V_HUMAN:
+            if not isinstance(self.Game.Player1, AgentPlayer):
+                self.NonAgentPlayer = self.Game.Player1  # Assign non agent player
+                self.AgentPlayer = self.Game.Player2  # Assign the agent
+                # Call our make_non_agent_move method
+                init_observation, p1r, p2r = self.make_non_agent_move()
+                # Return an initial observation based on this move
 
-            # self.alternate_player()
-            # self.Game.print_game_board()
-            return init_observation
+                # self.alternate_player()
+                # self.Game.print_game_board()
+                return init_observation
 
-        else:
-            # Essentially returning an empty board (and initial observation)
-            self.NonAgentPlayer = self.Game.Player2  # Assign non agent player
-            self.AgentPlayer = self.Game.Player1  # Assign the agent
-            # self.alternate_player()
+            else:
+                # Essentially returning an empty board (and initial observation)
+                self.NonAgentPlayer = self.Game.Player2  # Assign non agent player
+                self.AgentPlayer = self.Game.Player1  # Assign the agent
+                # self.alternate_player()
 
-            return self.Game.Board.Grid, 0, 0
+                return self.Game.Board.Grid, 0, 0
 
     def close(self):
         pass
@@ -173,24 +180,41 @@ class gym12x12_env(gym.Env):
         :return: returns the requested player type
         """
         if player_type == PlayerType.HUMAN:
-
+            if smart_ai:
+                warnings.warn("Smart AI is set to true, but will have no effect on an human player")
             return HumanPlayer()
 
         elif player_type == PlayerType.AGENT:
-
+            if smart_ai:
+                warnings.warn("Smart AI is set to true, but will have no effect on an agent player")
             return AgentPlayer(arg_name=argname)
 
         elif player_type == PlayerType.BOT:
             return BotPlayer(bot_name=argname, arg_smart_ai=smart_ai)
 
-    def initiate_game(self, arg_player1, arg_player2, arg_int_boardsize):
-        # When the game is initialized we
+    def initiate_game(self, arg_player1, arg_player2, arg_int_boardsize, arg_game_type):
+        # When the game is initialized we validate the type of player supplied
+        """
+        :param arg_player1:
+        :param arg_player2:
+        :param arg_int_boardsize:
+        :param arg_game_type:
+        :return:
+        """
+
         if not isinstance(arg_player1, Player):
             raise ValueError("Player 1 must be a player")
 
         if not isinstance(arg_player2, Player):
             raise ValueError("Player 2 must be a player")
 
+        if isinstance(arg_player1, AgentPlayer) and isinstance(arg_player2, AgentPlayer):
+            raise ValueError("Error. Two agents in game not allowed.")
+
+        if not self.make_sure_players_must_be(arg_game_type, arg_player1, arg_player2):
+            raise ValueError("Error. Game type is", arg_game_type, " but player types do not adhere to the game type")
+
+        self.GameType = arg_game_type
         self.Game = Game(arg_player1, arg_player2, rows=arg_int_boardsize, cols=arg_int_boardsize)
         self.action_space = spaces.Discrete(arg_int_boardsize * arg_int_boardsize)
 
@@ -198,11 +222,48 @@ class gym12x12_env(gym.Env):
 
         # Initialize pygame and set Screen size
         pygame.init()
-        screen_size = (MARGIN + BLOCK_SIZE)* arg_int_boardsize + MARGIN
+        screen_size = (MARGIN + BLOCK_SIZE) * arg_int_boardsize + MARGIN
 
         self.screen = pygame.display.set_mode((screen_size, screen_size))
 
         self.screen.fill((0, 0, 0))
+
+    def make_sure_players_must_be(self, game_type, p1, p2):
+        """
+        This is a helper function that returns true if one of the players is of type_one, and the other is of type_two
+        :param p1: a player
+        :param p2: a second player
+        :param game_type:
+        :return:
+        """
+        if game_type == self.GAME_TYPE_AGENT_V_BOT:
+            if isinstance(p1, AgentPlayer) and isinstance(p2, BotPlayer):
+                return True
+            elif isinstance(p1, BotPlayer) and isinstance(p2, AgentPlayer):
+                return True
+            else:
+                return False
+        elif game_type == self.GAME_TYPE_AGENT_V_HUMAN:
+            if isinstance(p1, AgentPlayer) and isinstance(p2, HumanPlayer):
+                return True
+            elif isinstance(p1, HumanPlayer) and isinstance(p2, AgentPlayer):
+                return True
+            else:
+                return False
+        elif game_type == self.GAME_TYPE_BOT_V_BOT:
+            if isinstance(p1, BotPlayer) and isinstance(p2, BotPlayer):
+                return True
+            else:
+                return False
+        elif game_type == self.GAME_TYPE_BOT_V_HUMAN:
+            if isinstance(p1, BotPlayer) and isinstance(p2, HumanPlayer):
+                return True
+            elif isinstance(p1, HumanPlayer) and isinstance(p2, BotPlayer):
+                return True
+            else:
+                return False
+        else:
+            return False
 
     def from_int_to_tuple(self, arg_int):
         row = arg_int // self.Game.Board.ROW_COUNT

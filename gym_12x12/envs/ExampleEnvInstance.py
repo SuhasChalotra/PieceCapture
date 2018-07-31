@@ -4,14 +4,18 @@ import time as tmr
 
 env = gym12x12_env()
 
-player_one = env.create_player(pt.AGENT, smart_ai=False, argname="bot1")
+player_one = env.create_player(pt.AGENT, smart_ai=False, argname="human")
 player_two = env.create_player(pt.BOT, smart_ai=True, argname="bot2")
-env.initiate_game(arg_player1=player_one, arg_player2=player_two, arg_int_boardsize=6)
+env.initiate_game(arg_player1=player_one, arg_player2=player_two, arg_int_boardsize=6, arg_game_type=env.GAME_TYPE_AGENT_V_BOT)
 float_game_speed_in_seconds = 0
+
+# These are test variables for stats
 blue_data_score = []
 red_data_score = []
 tie_data = []
-for i_episode in range(150):
+##########################################
+
+for i_episode in range(550):
     obs = env.reset()
     done = None
     i = 0
@@ -65,8 +69,13 @@ def get_wins_ties():
     # Let's return the ties as a percentage of the total eps
     pecentage_ties = total_ties / len(blue_data_score)
     print("Total episodes: ", len(blue_data_score))
-    print("Blue win count is", blue_wins, " red win count is:", red_wins, " tie percentage: ", pecentage_ties * 100, "%")
-    print("Blue wins", blue_wins / len(blue_data_score) * 100, "% of eps. Red Wins", red_wins / len(blue_data_score) * 100, "% of eps.")
+
+    if blue_wins > red_wins:
+        print("Blue win count is", blue_wins - len(tie_data), " red win count is:", red_wins, " tie percentage: ", pecentage_ties * 100, "%")
+        print("Blue wins", (blue_wins - total_ties) / len(blue_data_score) * 100, "% of eps. Red Wins", red_wins / len(blue_data_score) * 100, "% of eps.")
+    elif blue_wins < red_wins:
+        print("Blue win count is", blue_wins, " red win count is:", red_wins - len(tie_data), " tie percentage: ", pecentage_ties * 100, "%")
+        print("Blue wins", blue_wins / len(blue_data_score) * 100, "% of eps. Red Wins", (red_wins - total_ties) / len(blue_data_score) * 100, "% of eps.")
 
     max_tie = 0
     for index in range(len(tie_data) - 1):
