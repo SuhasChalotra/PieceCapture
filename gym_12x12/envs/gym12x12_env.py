@@ -38,36 +38,37 @@ class gym12x12_env(gym.Env):
          place the tile on the board(y, x)
         :return: observation, reward, done, info
         """
-        agent_master_reward_tally = 0
+        if self.GameType == self.GAME_TYPE_AGENT_V_BOT or self.GameType == self.GAME_TYPE_AGENT_V_HUMAN:
+            agent_master_reward_tally = 0
 
-        # Agent makes a play. move_results results in true or false
-        move_results, p1_reward, p2_reward = self.Game.place_piece(self.AgentPlayer, (action[0], action[1]))
-        if self.AgentPlayer.piece_color == Game.BLUE_PIECE:
-            agent_master_reward_tally += p1_reward - p2_reward
-        elif self.AgentPlayer.piece_color == Game.RED_PIECE:
-            agent_master_reward_tally += p2_reward - p1_reward
-
-        done_flag = self.Game.is_game_complete()
-        return_dict = []
-
-        if (not move_results) or done_flag:
-            # We must abort the step function and return the reward_tally (which should be negative)
-            return self.Game.Board.Grid, agent_master_reward_tally, done_flag, return_dict
-
-        # Make a non-agent move
-        if not done_flag:
-            ob_grid, p1r, p2r = self.make_non_agent_move()
-            # Calculate reward - we're essentially subtracting the agent's opponent's reward from the agent's
-            # reward, thereby calculating the net reward for the agent
-            if self.NonAgentPlayer.piece_color == Game.BLUE_PIECE:  # the non-agent is blue, subtract red from blue
-                agent_master_reward_tally += p2r - p1r
-            elif self.NonAgentPlayer.piece_color == Game.RED_PIECE:  # the non-agent is red. subtract blue from red
-                agent_master_reward_tally += p1r - p2r
+            # Agent makes a play. move_results results in true or false
+            move_results, p1_reward, p2_reward = self.Game.place_piece(self.AgentPlayer, (action[0], action[1]))
+            if self.AgentPlayer.piece_color == Game.BLUE_PIECE:
+                agent_master_reward_tally += p1_reward - p2_reward
+            elif self.AgentPlayer.piece_color == Game.RED_PIECE:
+                agent_master_reward_tally += p2_reward - p1_reward
 
             done_flag = self.Game.is_game_complete()
+            return_dict = []
 
-        return self.Game.Board.Grid, agent_master_reward_tally, done_flag, return_dict
-        #  observations, rewards, done, info
+            if (not move_results) or done_flag:
+                # We must abort the step function and return the reward_tally (which should be negative)
+                return self.Game.Board.Grid, agent_master_reward_tally, done_flag, return_dict
+
+            # Make a non-agent move
+            if not done_flag:
+                ob_grid, p1r, p2r = self.make_non_agent_move()
+                # Calculate reward - we're essentially subtracting the agent's opponent's reward from the agent's
+                # reward, thereby calculating the net reward for the agent
+                if self.NonAgentPlayer.piece_color == Game.BLUE_PIECE:  # the non-agent is blue, subtract red from blue
+                    agent_master_reward_tally += p2r - p1r
+                elif self.NonAgentPlayer.piece_color == Game.RED_PIECE:  # the non-agent is red. subtract blue from red
+                    agent_master_reward_tally += p1r - p2r
+
+                done_flag = self.Game.is_game_complete()
+
+            return self.Game.Board.Grid, agent_master_reward_tally, done_flag, return_dict
+            #  observations, rewards, done, info
 
     def render(self, mode='human'):
         self.draw_grid(self.Game.Board.Grid)
@@ -112,6 +113,13 @@ class gym12x12_env(gym.Env):
                 # self.alternate_player()
 
                 return self.Game.Board.Grid, 0, 0
+        elif self.GameType == self.GAME_TYPE_BOT_V_HUMAN:
+            # Bot V Human. This is a non-agent type scenario
+            null_obs, p1r, p2r = self.make_non_agent_move()
+            return null_obs
+        else:
+            raise NotImplemented("Not implemented yet")
+
 
     def close(self):
         pass
@@ -139,37 +147,97 @@ class gym12x12_env(gym.Env):
         """
         :return: observation and reward
         """
-        if isinstance(self.NonAgentPlayer, BotPlayer):
-            # Check if we're using smart or dumb strategies
-            if not self.NonAgentPlayer.smart_ai:
-                move = self.get_dumb_move()
-            else:
-                move = self.get_smart_move()
-
-            valid_m, p1_reward, p2_reward = self.Game.place_piece(self.NonAgentPlayer, (move[0], move[1]))
-
-            # We need to return an obs and reward
-            return self.Game.Board, p1_reward, p2_reward
-
-        if isinstance(self.NonAgentPlayer, HumanPlayer):
-            move = None
-
-            while move is None:
-                self.render()
-                move = pygame.event.wait()
-                valid_m = Game.GAME_MOVE_INVALID
-
-                if move.type == pygame.MOUSEBUTTONDOWN:
-                    y, x = move.pos
-                    y, x = y // (MARGIN + BLOCK_SIZE), x // (MARGIN + BLOCK_SIZE)
-                    valid_m, p1_reward, p2_reward = self.Game.place_piece(self.NonAgentPlayer, (y, x))  # TODO There is a mistake here (it was x,y), changed to (y,x)
-
-                if not valid_m:
-                    move = None
-
+        if self.GameType == self.GAME_TYPE_AGENT_V_BOT or self.GameType == self.GAME_TYPE_AGENT_V_HUMAN:
+            if isinstance(self.NonAgentPlayer, BotPlayer):
+                # Check if we're using smart or dumb strategies
+                if not self.NonAgentPlayer.smart_ai:
+                    move = self.get_dumb_move()
                 else:
-                    return self.Game.Board, p1_reward, p2_reward
-            pass
+                    move = self.get_smart_move()
+
+                valid_m, p1_reward, p2_reward = self.Game.place_piece(self.NonAgentPlayer, (move[0], move[1]))
+
+                # We need to return an obs and reward
+                return self.Game.Board, p1_reward, p2_reward
+
+            if isinstance(self.NonAgentPlayer, HumanPlayer):
+                move = None
+
+                while move is None:
+                    self.render()
+                    move = pygame.event.wait()
+                    valid_m = Game.GAME_MOVE_INVALID
+
+                    if move.type == pygame.MOUSEBUTTONDOWN:
+                        y, x = move.pos
+                        y, x = y // (MARGIN + BLOCK_SIZE), x // (MARGIN + BLOCK_SIZE)
+                        valid_m, p1_reward, p2_reward = self.Game.place_piece(self.NonAgentPlayer, (y, x))  # TODO There is a mistake here (it was x,y), changed to (y,x)
+
+                    if not valid_m:
+                        move = None
+
+                    else:
+                        return self.Game.Board, p1_reward, p2_reward
+                pass
+        elif self.GameType == self.GAME_TYPE_BOT_V_HUMAN:
+            if isinstance(self.Game.Player1, HumanPlayer):
+                move = None
+
+                while move is None:
+                    self.render()
+                    move = pygame.event.wait()
+                    valid_m = Game.GAME_MOVE_INVALID
+
+                    if move.type == pygame.MOUSEBUTTONDOWN:
+                        y, x = move.pos
+                        y, x = y // (MARGIN + BLOCK_SIZE), x // (MARGIN + BLOCK_SIZE)
+                        valid_m, p1_reward, p2_reward = self.Game.place_piece(self.Game.Player1, (y, x))  # TODO There is a mistake here (it was x,y), changed to (y,x)
+
+                    if not valid_m:
+                        move = None
+
+                    else:
+                        # Bot move here
+                        g_move = None
+                        if self.Game.Player2.smart_ai:
+                            g_move = self.get_smart_move()
+                        else:
+                            g_move = self.get_dumb_move()
+
+                        valid_m, p1_reward, p2_reward = self.Game.place_piece(self.Game.Player2, g_move)
+                        break
+
+                return self.Game.Board.Grid, p1_reward, p2_reward
+            elif isinstance(self.Game.Player1, BotPlayer):
+                bot_move = None
+                if self.Game.Player1.smart_ai:
+                    bot_move = self.get_smart_move()
+                else:
+                    bot_move = self.get_dumb_move()
+
+                # Do a bot move then enter a loop and get the human input
+                valid_m, p1_reward, p2_reward = self.Game.place_piece(self.Game.Player1, bot_move) # TODO This code probably doesn't make sense
+                p_move = None
+                while p_move is None:
+                    self.render()
+                    p_move = pygame.event.wait()
+                    valid_m = Game.GAME_MOVE_INVALID
+
+                    if p_move.type == pygame.MOUSEBUTTONDOWN:
+                        y, x = p_move.pos
+                        y, x = y // (MARGIN + BLOCK_SIZE), x // (MARGIN + BLOCK_SIZE)
+                        valid_m, p1_reward, p2_reward = self.Game.place_piece(self.Game.Player2, (y, x))
+
+                    if not valid_m:
+                        p_move = None
+                    else:
+                        break
+
+                return self.Game.Board.Grid, p1_reward, p2_reward
+
+        elif self.GameType == self.GAME_TYPE_BOT_V_BOT:
+            if isinstance(self.Game.Player1, BotPlayer):
+                pass
 
     @staticmethod
     def create_player(player_type, argname, smart_ai=False):
@@ -233,8 +301,8 @@ class gym12x12_env(gym.Env):
         This is a helper function that returns true if one of the players is of type_one, and the other is of type_two
         :param p1: a player
         :param p2: a second player
-        :param game_type:
-        :return:
+        :param game_type: an integer indicating the game type
+        :return: bool
         """
         if game_type == self.GAME_TYPE_AGENT_V_BOT:
             if isinstance(p1, AgentPlayer) and isinstance(p2, BotPlayer):
