@@ -69,6 +69,11 @@ class gym12x12_env(gym.Env):
 
             return self.Game.Board.Grid, agent_master_reward_tally, done_flag, return_dict
             #  observations, rewards, done, info
+        else:
+            # Game type is bot_v_human or bot_v_bot
+            ob_grid, p1r, p2r = self.make_non_agent_move()
+            done_flag = self.Game.is_game_complete()
+            return self.Game.Board.Grid, 0, done_flag, []
 
     def render(self, mode='human'):
         self.draw_grid(self.Game.Board.Grid)
@@ -120,15 +125,20 @@ class gym12x12_env(gym.Env):
         else:
             raise NotImplemented("Not implemented yet")
 
-
     def close(self):
         pass
 
     def seed(self, seed=None):
         pass
 
-    def get_smart_move(self):
-        return self.NonAgentPlayer.get_ai_move(self.Game.Board)
+    def get_smart_move(self, non_agent_player=None):
+        if self.GameType == self.GAME_TYPE_AGENT_V_BOT:
+            return self.NonAgentPlayer.get_ai_move(self.Game.Board)
+        else:
+            if isinstance(non_agent_player, BotPlayer):
+                return non_agent_player.get_ai_move(self.Game.Board)
+            else:
+                raise ValueError("Get smart move...unable to determine non-agent-player")
 
     def get_dumb_move(self):
         """
@@ -153,7 +163,7 @@ class gym12x12_env(gym.Env):
                 if not self.NonAgentPlayer.smart_ai:
                     move = self.get_dumb_move()
                 else:
-                    move = self.get_smart_move()
+                    move = self.get_smart_move(non_agent_player=self.NonAgentPlayer)
 
                 valid_m, p1_reward, p2_reward = self.Game.place_piece(self.NonAgentPlayer, (move[0], move[1]))
 
@@ -171,7 +181,7 @@ class gym12x12_env(gym.Env):
                     if move.type == pygame.MOUSEBUTTONDOWN:
                         y, x = move.pos
                         y, x = y // (MARGIN + BLOCK_SIZE), x // (MARGIN + BLOCK_SIZE)
-                        valid_m, p1_reward, p2_reward = self.Game.place_piece(self.NonAgentPlayer, (y, x))  # TODO There is a mistake here (it was x,y), changed to (y,x)
+                        valid_m, p1_reward, p2_reward = self.Game.place_piece(self.NonAgentPlayer, (x, y))
 
                     if not valid_m:
                         move = None
@@ -191,7 +201,7 @@ class gym12x12_env(gym.Env):
                     if move.type == pygame.MOUSEBUTTONDOWN:
                         y, x = move.pos
                         y, x = y // (MARGIN + BLOCK_SIZE), x // (MARGIN + BLOCK_SIZE)
-                        valid_m, p1_reward, p2_reward = self.Game.place_piece(self.Game.Player1, (y, x))  # TODO There is a mistake here (it was x,y), changed to (y,x)
+                        valid_m, p1_reward, p2_reward = self.Game.place_piece(self.Game.Player1, (x, y))
 
                     if not valid_m:
                         move = None
@@ -200,7 +210,7 @@ class gym12x12_env(gym.Env):
                         # Bot move here
                         g_move = None
                         if self.Game.Player2.smart_ai:
-                            g_move = self.get_smart_move()
+                            g_move = self.get_smart_move(non_agent_player=self.Game.Player2)
                         else:
                             g_move = self.get_dumb_move()
 
@@ -211,7 +221,7 @@ class gym12x12_env(gym.Env):
             elif isinstance(self.Game.Player1, BotPlayer):
                 bot_move = None
                 if self.Game.Player1.smart_ai:
-                    bot_move = self.get_smart_move()
+                    bot_move = self.get_smart_move(non_agent_player=self.Game.Player1)
                 else:
                     bot_move = self.get_dumb_move()
 
@@ -226,7 +236,7 @@ class gym12x12_env(gym.Env):
                     if p_move.type == pygame.MOUSEBUTTONDOWN:
                         y, x = p_move.pos
                         y, x = y // (MARGIN + BLOCK_SIZE), x // (MARGIN + BLOCK_SIZE)
-                        valid_m, p1_reward, p2_reward = self.Game.place_piece(self.Game.Player2, (y, x))
+                        valid_m, p1_reward, p2_reward = self.Game.place_piece(self.Game.Player2, (x, y))
 
                     if not valid_m:
                         p_move = None
@@ -291,8 +301,9 @@ class gym12x12_env(gym.Env):
         # Initialize pygame and set Screen size
         pygame.init()
         screen_size = (MARGIN + BLOCK_SIZE) * arg_int_boardsize + MARGIN
+        scoreboard_width = 150
 
-        self.screen = pygame.display.set_mode((screen_size, screen_size))
+        self.screen = pygame.display.set_mode((screen_size + scoreboard_width, screen_size)) # TODO - adjust dimensions to accomodate a small scoreboard. Add a scoreboard
 
         self.screen.fill((0, 0, 0))
 
@@ -334,11 +345,20 @@ class gym12x12_env(gym.Env):
             return False
 
     def from_int_to_tuple(self, arg_int):
+        """
+        Returns the array index to a [row, col] tuple
+        :param arg_int: the index of an array
+        :return: a tuple [row, col] (y, x)
+        """
         row = arg_int // self.Game.Board.ROW_COUNT
         col = arg_int % self.Game.Board.ROW_COUNT
         return tuple([row, col])
 
     def draw_grid(self, grid):
+        """
+        :param grid: Game.Board.Grid (a numpy zeros)
+        :return: None
+        """
 
         for col in range(self.Game.Board.COL_COUNT):
             for row in range(self.Game.Board.ROW_COUNT):
