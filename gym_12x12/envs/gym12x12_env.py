@@ -270,7 +270,7 @@ class gym12x12_env(gym.Env):
         elif player_type == PlayerType.BOT:
             return BotPlayer(bot_name=argname, arg_smart_ai=smart_ai)
 
-    def initiate_game(self, arg_player1, arg_player2, arg_int_boardsize, arg_game_type):
+    def initiate_game(self, arg_player1, arg_player2, arg_int_boardsize, arg_game_type, arg_render=False):
         # When the game is initialized we validate the type of player supplied
         """
         :param arg_player1:
@@ -303,9 +303,10 @@ class gym12x12_env(gym.Env):
         screen_size = (MARGIN + BLOCK_SIZE) * arg_int_boardsize + MARGIN
         scoreboard_width = 150
 
-        self.screen = pygame.display.set_mode((screen_size + scoreboard_width, screen_size)) # TODO - adjust dimensions to accomodate a small scoreboard. Add a scoreboard
+        if arg_render:
+            self.screen = pygame.display.set_mode((screen_size + scoreboard_width, screen_size)) # TODO - adjust dimensions to accomodate a small scoreboard. Add a scoreboard
 
-        self.screen.fill((0, 0, 0))
+            self.screen.fill((0, 0, 0))
 
     def make_sure_players_must_be(self, game_type, p1, p2):
         """
