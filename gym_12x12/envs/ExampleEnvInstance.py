@@ -6,7 +6,7 @@ env = gym12x12_env()
 
 player_one = env.create_player(pt.HUMAN, smart_ai=False, argname="human")
 player_two = env.create_player(pt.BOT, smart_ai=True, argname="bot2")
-env.initiate_game(arg_player1=player_one, arg_player2=player_two, arg_int_boardsize=6, arg_game_type=env.GAME_TYPE_BOT_V_HUMAN)
+env.initiate_game(arg_player1=player_one, arg_player2=player_two, arg_int_boardsize=6, arg_game_type=env.GAME_TYPE_BOT_V_HUMAN, arg_render=True)
 float_game_speed_in_seconds = 0
 
 # These are test variables for stats

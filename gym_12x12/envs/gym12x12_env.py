@@ -299,11 +299,10 @@ class gym12x12_env(gym.Env):
         self.observation_space = spaces.Box(high=2, low=-1, shape=[arg_int_boardsize, arg_int_boardsize], dtype=int)
 
         # Initialize pygame and set Screen size
-        pygame.init()
-        screen_size = (MARGIN + BLOCK_SIZE) * arg_int_boardsize + MARGIN
-        scoreboard_width = 150
-
         if arg_render:
+            pygame.init()
+            screen_size = (MARGIN + BLOCK_SIZE) * arg_int_boardsize + MARGIN
+            scoreboard_width = 150
             self.screen = pygame.display.set_mode((screen_size + scoreboard_width, screen_size)) # TODO - adjust dimensions to accomodate a small scoreboard. Add a scoreboard
 
             self.screen.fill((0, 0, 0))
@@ -367,7 +366,7 @@ class gym12x12_env(gym.Env):
                 x = (MARGIN + BLOCK_SIZE) * row + MARGIN
 
                 if (col, row) in self.Game.captured_pieces:
-                    pygame.draw.rect(self.screen, (0, 0, 0), (x, y, BLOCK_SIZE, BLOCK_SIZE))
+                    pygame.draw.rect(self.screen, (255, 255, 0), (x, y, BLOCK_SIZE, BLOCK_SIZE))
                 else:
                     pygame.draw.rect(self.screen, (255, 255, 255), (x, y, BLOCK_SIZE, BLOCK_SIZE))
 
