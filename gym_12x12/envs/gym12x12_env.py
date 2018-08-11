@@ -30,6 +30,7 @@ class gym12x12_env(gym.Env):
         self.NonAgentPlayer = None
         self.screen = None
         self.GameType = None
+        self.Render = False
 
     def step(self, action):
         """
@@ -295,11 +296,12 @@ class gym12x12_env(gym.Env):
         self.GameType = arg_game_type
         self.Game = Game(arg_player1, arg_player2, rows=arg_int_boardsize, cols=arg_int_boardsize)
         self.action_space = spaces.Discrete(arg_int_boardsize * arg_int_boardsize)
+        self.Render = arg_render
 
         self.observation_space = spaces.Box(high=2, low=-1, shape=[arg_int_boardsize, arg_int_boardsize], dtype=int)
 
         # Initialize pygame and set Screen size
-        if arg_render:
+        if self.Render:
             pygame.init()
             screen_size = (MARGIN + BLOCK_SIZE) * arg_int_boardsize + MARGIN
             scoreboard_width = 150
