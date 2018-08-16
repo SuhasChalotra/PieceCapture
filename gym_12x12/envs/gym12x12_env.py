@@ -123,7 +123,10 @@ class gym12x12_env(gym.Env):
             # Bot V Human. This is a non-agent type scenario
             null_obs, p1r, p2r = self.make_non_agent_move()
             return null_obs
-        else:
+        elif self.GameType == self.GAME_TYPE_BOT_V_BOT:
+            # implement a bot v bot scenario
+            null_obs, p1r, p2r = self.make_non_agent_move()
+            return null_obs
             raise NotImplemented("Not implemented yet")
 
     def close(self):
@@ -247,8 +250,34 @@ class gym12x12_env(gym.Env):
                 return self.Game.Board.Grid, p1_reward, p2_reward
 
         elif self.GameType == self.GAME_TYPE_BOT_V_BOT:
-            if isinstance(self.Game.Player1, BotPlayer):
-                pass
+            # Player 1 and Player 2 are both bots
+            p1_botmove = None
+            p2_botmove = None
+            valid_m = None
+            p1_reward = None
+            p2_reward = None
+
+            # Get a move for player 1
+            if self.Game.Player1.smart_ai:
+                p1_botmove = self.get_smart_move(non_agent_player=self.Game.Player1)
+
+            else:
+                # Get a dumb, random move
+                p1_botmove = self.get_dumb_move()
+
+            # Player 1 shall make its move
+            valid_m, p1_reward, p2_reward = self.Game.place_piece(self.Game.Player1, p1_botmove)
+
+            # Get a move for player 2
+            if self.Game.Player2.smart_ai:
+                p2_botmove = self.get_smart_move(non_agent_player=self.Game.Player2)
+            else:
+                # Get a dumb move
+                p2_botmove = self.get_dumb_move()
+
+            valid_m, p1_reward, p2_reward = self.Game.place_piece(self.Game.Player2, p2_botmove)
+
+            return self.Game.Board.Grid, p1_reward, p2_reward
 
     @staticmethod
     def create_player(player_type, argname, smart_ai=False):
