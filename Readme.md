@@ -1,17 +1,10 @@
-Bug List:
-=========
-(mm.dd.yyyy) - (bug no.) - description
+Introduction
 
-07.22.2018 - 000.00 - While debugging, game progresses until remaining empty spot
-where the debugger reports: x is out of range, x= -1 and game will not end.
-Status: resolved - 07.22.2018
+This repo is intended to be used for Creating and testing a DQN agent that will be trained using google colab to play a relatively simple game called  PieceCapture.
 
-07.22.2018 - 001.00 - when playing Bot v Bot, the final move always seems to be [5,5]
-however the previous 4 moves are not the same sequence. The final move shouldn't always be 
-the same spot.
-Status: resolved - 07.22.2018 - 
+Gameplan
 
-07.22.2018 - 002.00 - AI generally buggy. The scoring is too high. It should be more stalemate
-Resolution: moved the env.alternate_player() method until after the env.step(action) call
-
-Status: tenatively resolved -
+ToDo
+-[] Refactor the code to remove any gym dependencies
+-[] Build the DQN
+-[] Testing 
