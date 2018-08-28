@@ -5,6 +5,6 @@ This repo is intended to be used for Creating and testing a DQN agent that will 
 Gameplan
 
 ToDo
--[] Refactor the code to remove any gym dependencies
--[] Build the DQN
--[] Testing 
+-[ ] Refactor the code to remove any gym dependencies
+-[ ] Build the DQN
+-[ ] Testing 
