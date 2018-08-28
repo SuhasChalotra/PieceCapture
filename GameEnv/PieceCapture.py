@@ -1,6 +1,6 @@
 import gym
-from gym_12x12.envs.env_classes.player import Player, HumanPlayer, BotPlayer, AgentPlayer
-from gym_12x12.envs.env_classes.game import Game
+from .env_classes.player import Player, HumanPlayer, BotPlayer, AgentPlayer
+from .env_classes.game import Game
 from gym import spaces
 import random as rnd
 import pygame
@@ -10,17 +10,19 @@ MARGIN = 5
 BLOCK_SIZE = 30
 
 
-class PlayerType:
-    HUMAN = 2
-    AGENT = 1
-    BOT = 0
 
 
-class gym12x12_env(gym.Env):
+
+class PieceCapture():
     GAME_TYPE_AGENT_V_BOT = 0
     GAME_TYPE_AGENT_V_HUMAN = 1
     GAME_TYPE_BOT_V_BOT = 2
     GAME_TYPE_BOT_V_HUMAN = 3
+
+    class PlayerType:
+        HUMAN = 2
+        AGENT = 1
+        BOT = 0
 
     def __init__(self):
         self.Game = None
@@ -287,18 +289,20 @@ class gym12x12_env(gym.Env):
         :param argname: friendly name
         :return: returns the requested player type
         """
-        if player_type == PlayerType.HUMAN:
+        if player_type == PieceCapture.PlayerType.HUMAN:
             if smart_ai:
                 warnings.warn("Smart AI is set to true, but will have no effect on an human player")
             return HumanPlayer()
 
-        elif player_type == PlayerType.AGENT:
+        elif player_type == PieceCapture.PlayerType.AGENT:
             if smart_ai:
                 warnings.warn("Smart AI is set to true, but will have no effect on an agent player")
             return AgentPlayer(arg_name=argname)
 
-        elif player_type == PlayerType.BOT:
+        elif player_type == PieceCapture.PlayerType.BOT:
             return BotPlayer(bot_name=argname, arg_smart_ai=smart_ai)
+
+
 
     def initiate_game(self, arg_player1, arg_player2, arg_int_boardsize, arg_game_type, arg_render=False):
         # When the game is initialized we validate the type of player supplied

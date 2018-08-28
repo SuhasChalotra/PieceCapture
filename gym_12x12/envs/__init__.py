@@ -1,1 +1,0 @@
-from gym_12x12.envs.gym12x12_env import gym12x12_env

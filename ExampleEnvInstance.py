@@ -1,12 +1,17 @@
-from gym_12x12.envs.gym12x12_env import gym12x12_env, PlayerType as pt
+from GameEnv.PieceCapture import PieceCapture
+
 import time as tmr
 
 
-env = gym12x12_env()
+env = PieceCapture()
 
-player_one = env.create_player(pt.BOT, smart_ai=False, argname="bot1")
-player_two = env.create_player(pt.BOT, smart_ai=True, argname="bot2")
-env.initiate_game(arg_player1=player_one, arg_player2=player_two, arg_int_boardsize=6, arg_game_type=env.GAME_TYPE_BOT_V_BOT, arg_render=True)
+player_one = env.create_player(env.PlayerType.HUMAN, smart_ai=False, argname="bot1")
+player_two = env.create_player(env.PlayerType.BOT, smart_ai=True, argname="bot2")
+env.initiate_game(arg_player1=player_one,
+                  arg_player2=player_two,
+                  arg_int_boardsize=10,
+                  arg_game_type=env.GAME_TYPE_BOT_V_HUMAN,
+                  arg_render=True)
 float_game_speed_in_seconds = 0
 
 # These are test variables for stats
@@ -23,7 +28,7 @@ for i_episode in range(50):
     while not done:
         action = env.from_int_to_tuple(env.action_space.sample())
         obs, reward, done, info = env.step(action)
-        # env.render()
+        env.render()
         tmr.sleep(float_game_speed_in_seconds)
         if done:
             # print("Finished. Episode", i_episode, "score ", "BLUE:", env.Game.PlayerOneScore, " RED:", env.Game.PlayerTwoScore)
