@@ -1,7 +1,5 @@
-import gym
 from .env_classes.player import Player, HumanPlayer, BotPlayer, AgentPlayer
 from .env_classes.game import Game
-from gym import spaces
 import random as rnd
 import pygame
 import warnings
@@ -36,7 +34,7 @@ class PieceCapture():
 
     def step(self, action):
         """
-        This complies with the gym interface: Placing a tile on the board and alternates the current player
+        : Placing a tile on the board and alternates the current player
         :param action: a tuple  which contains the player's row_move, col_move -ie. where they will
          place the tile on the board(y, x)
         :return: observation, reward, done, info
