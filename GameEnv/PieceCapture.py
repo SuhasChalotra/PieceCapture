@@ -1,6 +1,7 @@
 from .env_classes.player import Player, HumanPlayer, BotPlayer, AgentPlayer
 from .env_classes.game import Game
 import random as rnd
+import numpy as np
 import pygame
 import warnings
 
@@ -144,7 +145,7 @@ class PieceCapture():
             else:
                 raise ValueError("Get smart move...unable to determine non-agent-player")
 
-    def get_dumb_move(self):
+    def get_random_move(self):
         """
         This function returns a random spot to play from the Game.Board.empty_spaces property
         :empty_move_list: the cached list of available moves
@@ -165,7 +166,7 @@ class PieceCapture():
             if isinstance(self.NonAgentPlayer, BotPlayer):
                 # Check if we're using smart or dumb strategies
                 if not self.NonAgentPlayer.smart_ai:
-                    move = self.get_dumb_move()
+                    move = self.get_random_move()
                 else:
                     move = self.get_smart_move(non_agent_player=self.NonAgentPlayer)
 
@@ -216,7 +217,7 @@ class PieceCapture():
                         if self.Game.Player2.smart_ai:
                             g_move = self.get_smart_move(non_agent_player=self.Game.Player2)
                         else:
-                            g_move = self.get_dumb_move()
+                            g_move = self.get_random_move()
 
                         valid_m, p1_reward, p2_reward = self.Game.place_piece(self.Game.Player2, g_move)
                         break
@@ -227,7 +228,7 @@ class PieceCapture():
                 if self.Game.Player1.smart_ai:
                     bot_move = self.get_smart_move(non_agent_player=self.Game.Player1)
                 else:
-                    bot_move = self.get_dumb_move()
+                    bot_move = self.get_random_move()
 
                 # Do a bot move then enter a loop and get the human input
                 valid_m, p1_reward, p2_reward = self.Game.place_piece(self.Game.Player1, bot_move) # TODO This code probably doesn't make sense
@@ -263,7 +264,7 @@ class PieceCapture():
 
             else:
                 # Get a dumb, random move
-                p1_botmove = self.get_dumb_move()
+                p1_botmove = self.get_random_move()
 
             # Player 1 shall make its move
             valid_m, p1_reward, p2_reward = self.Game.place_piece(self.Game.Player1, p1_botmove)
@@ -273,7 +274,7 @@ class PieceCapture():
                 p2_botmove = self.get_smart_move(non_agent_player=self.Game.Player2)
             else:
                 # Get a dumb move
-                p2_botmove = self.get_dumb_move()
+                p2_botmove = self.get_random_move()
 
             valid_m, p1_reward, p2_reward = self.Game.place_piece(self.Game.Player2, p2_botmove)
 
@@ -326,10 +327,10 @@ class PieceCapture():
 
         self.GameType = arg_game_type
         self.Game = Game(arg_player1, arg_player2, rows=arg_int_boardsize, cols=arg_int_boardsize)
-        self.action_space = spaces.Discrete(arg_int_boardsize * arg_int_boardsize)
+        self.action_space = np.ndarray(arg_int_boardsize * arg_int_boardsize)
         self.Render = arg_render
 
-        self.observation_space = spaces.Box(high=2, low=-1, shape=[arg_int_boardsize, arg_int_boardsize], dtype=int)
+        self.observation_space = np.ndarray( shape=[arg_int_boardsize, arg_int_boardsize], dtype=int)
 
         # Initialize pygame and set Screen size
         if self.Render:

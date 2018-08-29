@@ -26,7 +26,7 @@ for i_episode in range(50):
     i = 0
 
     while not done:
-        action = env.from_int_to_tuple(env.action_space.sample())
+        action = env.get_random_move()
         obs, reward, done, info = env.step(action)
         env.render()
         tmr.sleep(float_game_speed_in_seconds)
