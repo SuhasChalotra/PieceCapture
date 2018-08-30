@@ -1,5 +1,5 @@
 from abc import ABC, ABCMeta
-from random import randint
+import random as randint
 from .gameboard import GameBoard
 # Games need players. But we should only be able to instantiate a HumanPlayer or an AIPlayer
 # The Class 'Player' is abstract
@@ -133,7 +133,7 @@ class BotPlayer (Player):
                 if try_count >= board_state.board_size:
                     break
 
-                int_pick = randint(0, len(pt_scoring) - 1)
+                int_pick = randint.randint(0, len(pt_scoring) - 1)
                 strat_return_move = pt_scoring[int_pick].scoring_move
 
                 if not self.will_move_endanger_player(strat_return_move, board_state):
@@ -148,22 +148,22 @@ class BotPlayer (Player):
             # the higher the level, the greater the priority. Pick a random strategy and random possible move from
             # the chosen strategy and return that
             if len(L4) > 0:
-                int_pick = randint(0, len(L4) - 1)
-                r_pick = randint(0, len(L4[int_pick].possible_moves) - 1)
+                int_pick = randint.randint(0, len(L4) - 1)
+                r_pick = randint.randint(0, len(L4[int_pick].possible_moves) - 1)
                 strat_return_move = L4[int_pick].possible_moves[r_pick]
                 # print("Lvl 4 Point block strategy taken")
                 return strat_return_move
 
             if len(L3) > 0:
-                int_pick = randint(0, len(L3) - 1)
-                r_pick = randint(0, len(L3[int_pick].possible_moves) - 1)
+                int_pick = randint.randint(0, len(L3) - 1)
+                r_pick = randint.randint(0, len(L3[int_pick].possible_moves) - 1)
                 strat_return_move = L3[int_pick].possible_moves[r_pick]
                 # print("Lvl 3 Point block strategy taken")
                 return strat_return_move
 
             if len(L2) > 0:
-                int_pick = randint(0, len(L2) - 1)
-                r_pick = randint(0, len(L2[int_pick].possible_moves) - 1)
+                int_pick = randint.randint(0, len(L2) - 1)
+                r_pick = randint.randint(0, len(L2[int_pick].possible_moves) - 1)
                 strat_return_move = L2[int_pick].possible_moves[r_pick]
                 # print("Lvl 2 Point block strategy taken")
                 return strat_return_move
@@ -178,7 +178,7 @@ class BotPlayer (Player):
                         if int_count >= len(strat.possible_moves) + 5:
                             break
 
-                        int_pick = randint(0, len(strat.possible_moves) - 1)
+                        int_pick = randint.randint(0, len(strat.possible_moves) - 1)
                         list_considered_move = strat.possible_moves[int_pick]
 
                         if not self.will_move_endanger_player(list_considered_move, board_state):
@@ -230,7 +230,7 @@ class BotPlayer (Player):
                     if int_count_break >= len(board_state.empty_spots):
                         break
 
-                    int_pb_pick = randint(0, len(L4) - 1)
+                    int_pb_pick = randint.randint(0, len(L4) - 1)
                     move_choice = self.get_random_element(L4[int_pb_pick].possible_moves) # this is a tuple
                     # make sure the move won't endanger the AI
                     if not self.will_move_endanger_player(move_choice, board_state) and not self.will_move_spoil_white_space_strat(move_choice, board_state):
@@ -245,7 +245,7 @@ class BotPlayer (Player):
                     if int_count_break >= len(board_state.empty_spots):
                         break
 
-                    int_pb_pick = randint(0, len(L3) - 1)
+                    int_pb_pick = randint.randint(0, len(L3) - 1)
                     move_choice = self.get_random_element(L3[int_pb_pick].possible_moves)  # this is a tuple
                     # make sure the move won't endanger the AI
                     if not self.will_move_endanger_player(move_choice, board_state) and not self.will_move_spoil_white_space_strat(move_choice, board_state):
@@ -260,7 +260,7 @@ class BotPlayer (Player):
                     if int_count_break >= len(board_state.empty_spots):
                         break
 
-                    int_pb_pick = randint(0, len(L2) - 1)
+                    int_pb_pick = randint.randint(0, len(L2) - 1)
                     move_choice = self.get_random_element(L2[int_pb_pick].possible_moves)  # this is a tuple
                     # make sure the move won't endanger the AI
                     if not self.will_move_endanger_player(move_choice, board_state) and not self.will_move_spoil_white_space_strat(move_choice, board_state):
@@ -271,7 +271,20 @@ class BotPlayer (Player):
 
         # White space offensive strategies
         if len(off_ws_str) > 0:
-            pass  #TODO
+            # We'll pick a strategy at random from off_ws_str, but it cannot endanger the player
+            ws_int_count = 0
+            while True:
+                if ws_int_count >= len(board_state.empty_spots):
+                    break
+
+                random_chosen_strategy = randint.choice(off_ws_str) # this will return a random strategy from the main list off_ws_str
+                # from this we need to pick from one of the possible_diagonal_moves. The move we pick must pass the endangerment test
+                p_diagonal_move = randint.choice(random_chosen_strategy.possible_moves_diagonal)
+
+                if not self.will_move_endanger_player(p_diagonal_move, board_state):
+                    return p_diagonal_move
+                else:
+                    ws_int_count += 1  # Increment the count
 
         # Finally we check remaining strategies
         """
@@ -351,7 +364,7 @@ class BotPlayer (Player):
         """
         if isinstance(empty_move_list, list) or isinstance(empty_move_list, tuple):
             if len(empty_move_list) > 0:
-                choice = randint(0, len(empty_move_list) - 1)
+                choice = randint.randint(0, len(empty_move_list) - 1)
                 return empty_move_list[choice]
             else:
                 return -1, -1  # Signifies that there are no empty moves left
@@ -458,7 +471,7 @@ class BotPlayer (Player):
 
         return_list = []
         for strategy in master_list:
-            if strategy.is_white_space_block_opportunity == True and strategy.white_space_block_priority >= 2:
+            if strategy.is_white_space_block_opportunity and strategy.white_space_block_priority >= 2:
                 return_list.append(strategy)
 
         return return_list

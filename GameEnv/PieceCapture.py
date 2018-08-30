@@ -9,9 +9,6 @@ MARGIN = 5
 BLOCK_SIZE = 30
 
 
-
-
-
 class PieceCapture():
     GAME_TYPE_AGENT_V_BOT = 0
     GAME_TYPE_AGENT_V_HUMAN = 1
@@ -78,9 +75,10 @@ class PieceCapture():
             return self.Game.Board.Grid, 0, done_flag, []
 
     def render(self, mode='human'):
-        self.draw_grid(self.Game.Board.Grid)
-        pygame.event.get()
-        pygame.display.flip()
+        if self.Render:
+            self.draw_grid(self.Game.Board.Grid)
+            pygame.event.get()
+            pygame.display.flip()
 
     def reset(self):
         """
@@ -330,7 +328,7 @@ class PieceCapture():
         self.action_space = np.ndarray(arg_int_boardsize * arg_int_boardsize)
         self.Render = arg_render
 
-        self.observation_space = np.ndarray( shape=[arg_int_boardsize, arg_int_boardsize], dtype=int)
+        self.observation_space = np.ndarray(shape=[arg_int_boardsize, arg_int_boardsize], dtype=int)
 
         # Initialize pygame and set Screen size
         if self.Render:

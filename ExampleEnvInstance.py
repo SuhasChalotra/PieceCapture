@@ -1,18 +1,20 @@
 from GameEnv.PieceCapture import PieceCapture
 
 import time as tmr
-
+import warnings
 
 env = PieceCapture()
 
-player_one = env.create_player(env.PlayerType.HUMAN, smart_ai=False, argname="bot1")
+# Required: Set our players and player types, create a game and specify the game time
+player_one = env.create_player(env.PlayerType.BOT, smart_ai=True, argname="Agent")
 player_two = env.create_player(env.PlayerType.BOT, smart_ai=True, argname="bot2")
 env.initiate_game(arg_player1=player_one,
                   arg_player2=player_two,
                   arg_int_boardsize=10,
-                  arg_game_type=env.GAME_TYPE_BOT_V_HUMAN,
-                  arg_render=True)
+                  arg_game_type=env.GAME_TYPE_BOT_V_BOT,
+                  arg_render=False)
 float_game_speed_in_seconds = 0
+int_number_of_episodes = 50  # Change here for number of episodes
 
 # These are test variables for stats
 blue_data_score = []
@@ -20,7 +22,10 @@ red_data_score = []
 tie_data = []
 ##########################################
 
-for i_episode in range(50):
+if not env.Render:
+    warnings.warn("Friendly warning: Rendering is turned off")
+
+for i_episode in range(int_number_of_episodes):
     obs = env.reset()
     done = None
     i = 0
@@ -31,11 +36,13 @@ for i_episode in range(50):
         env.render()
         tmr.sleep(float_game_speed_in_seconds)
         if done:
-            # print("Finished. Episode", i_episode, "score ", "BLUE:", env.Game.PlayerOneScore, " RED:", env.Game.PlayerTwoScore)
+            #  print("Finished. Episode", i_episode, "score ", "BLUE:", env.Game.PlayerOneScore, " RED:", env.Game.PlayerTwoScore)
             blue_data_score.append(env.Game.PlayerOneScore)
             red_data_score.append(env.Game.PlayerTwoScore)
             if env.Game.PlayerOneScore == env.Game.PlayerTwoScore:
                 tie_data.append(tuple([i_episode, env.Game.PlayerOneScore, env.Game.PlayerTwoScore]))
+
+
 
 
 def get_stats_average(blue_data, red_data):
@@ -90,9 +97,15 @@ def get_wins_ties():
     print("Highest tie is:", max_tie)
 
 
-t_eps, blue, red = get_stats_average(blue_data_score, red_data_score)
-blue, red = get_stats_high_score(blue_data_score, red_data_score)
-print("Highest score:", "BLUE:", blue, "RED:", red)
-print("Number of ties:", len(tie_data))
-print(tie_data)
-get_wins_ties()
+if int_number_of_episodes > 0:
+    t_eps, blue, red = get_stats_average(blue_data_score, red_data_score)
+    blue, red = get_stats_high_score(blue_data_score, red_data_score)
+    print("Highest score:", "BLUE:", blue, "RED:", red)
+    print("Number of ties:", len(tie_data))
+    print(tie_data)
+    get_wins_ties()
+else :
+    print("No stats to display")
+
+
+
