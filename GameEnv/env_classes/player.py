@@ -269,6 +269,10 @@ class BotPlayer (Player):
                     else:
                         int_count_break += 1
 
+        # White space offensive strategies
+        if len(off_ws_str) > 0:
+            pass  #TODO
+
         # Finally we check remaining strategies
         """
         At this point no viable strategies have been found (it's probably close to the end of the game. Let's sort out the remaining strategies and get the ones where there are 
