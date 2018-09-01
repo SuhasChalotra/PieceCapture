@@ -8,8 +8,8 @@ class Game:
     EMPTY = 0
     RED_PIECE = -1
     BLUE_PIECE = 1
-    POINT_REWARD = 10
-    INVALID_MOVE_PENALIZATION = -1
+    POINT_REWARD = 1
+    INVALID_MOVE_PENALIZATION = -.1
 
     def __init__(self, player_1, player_2, rows=6, cols=6):
         """
@@ -92,7 +92,7 @@ class Game:
         if arg_player.piece_color == Game.BLUE_PIECE:
             blue_reward = Game.INVALID_MOVE_PENALIZATION
             red_reward = 0
-        elif arg_player.piece_color == Game.RED_PIECE:
+        else:
             red_reward = Game.INVALID_MOVE_PENALIZATION
             blue_reward = 0
 
