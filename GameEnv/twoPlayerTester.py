@@ -19,8 +19,8 @@ obs2, reward , done = player_two_move(action2)
 """
 
 
-from env_classes.game import Game
-from env_classes.player import Player,BotPlayer
+from .env_classes.game import Game
+from .env_classes.player import Player, BotPlayer
 import random as rd
 import time as tmr
 
