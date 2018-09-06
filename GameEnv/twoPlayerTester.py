@@ -89,9 +89,10 @@ class PieceCaptureTwoStep:
     def make_player_smart(self, player_num):
         if player_num == 1:
             self.p1 = BotPlayer()
-            self.game.__assign_player_piece_color()
+            self.game.assign_player_piece_color()
         if player_num == 2:
             self.p2 = BotPlayer()
-            self.game.__assign_player_piece_color()
+            self.game.assign_player_piece_color()
 
-
+    def reset(self):
+        self.game.reset()

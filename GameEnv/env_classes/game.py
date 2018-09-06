@@ -32,7 +32,7 @@ class Game:
         else:
             raise ValueError("Player 2: type must be of type Player")
 
-        self.__assign_player_piece_color()  # ensure piece colors are different for each player
+        self.assign_player_piece_color()  # ensure piece colors are different for each player
         #  Create a new game board
         self.Board = gb(size_y=rows, size_x=cols)
 
@@ -70,7 +70,7 @@ class Game:
         self.Board.clear()  # this should reset empty spots and clear the game board
 
 
-    def __assign_player_piece_color(self):
+    def assign_player_piece_color(self):
         """
         This private method will ensure that the Player1 is BLUE and Player2 is RED
         """
