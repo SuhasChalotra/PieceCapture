@@ -22,6 +22,7 @@ obs2, reward , done = player_two_move(action2)
 from .env_classes.game import Game
 from .env_classes.player import Player, BotPlayer
 import random as rd
+import numpy as np
 import time as tmr
 
 class PieceCaptureTwoStep:
@@ -30,6 +31,7 @@ class PieceCaptureTwoStep:
         self.p1 = Player()
         self.p2 = Player()
         self.curr_player = self.p1
+        self.action_space = np.ndarray(arg_int_boardsize * arg_int_boardsize)
 
         self.game = Game(self.p1, self.p2, x_size, y_size)
         self.game.start()
