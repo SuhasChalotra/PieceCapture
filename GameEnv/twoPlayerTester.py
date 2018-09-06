@@ -96,3 +96,4 @@ class PieceCaptureTwoStep:
 
     def reset(self):
         self.game.reset()
+        return self.game.Board.Grid
