@@ -32,7 +32,6 @@ class PieceCaptureTwoStep:
         self.p2 = Player()
         self.curr_player = self.p1
         self.action_space = np.ndarray(x_size, y_size)
-
         self.game = Game(self.p1, self.p2, x_size, y_size)
         self.game.start()
 
