@@ -99,3 +99,6 @@ class PieceCaptureTwoStep:
     def reset(self):
         self.game.reset()
         return self.game.Board.Grid
+    
+    def get_action_space(self):
+        return len(self.action_space)
