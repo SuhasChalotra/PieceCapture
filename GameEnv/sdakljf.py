@@ -1,7 +1,7 @@
 from twoPlayerTester import PieceCaptureTwoStep
 import time as tmr
 game = PieceCaptureTwoStep()
-game.get_action_space()
+print(dir(game))
 done = False
 
 a = tmr.time()
