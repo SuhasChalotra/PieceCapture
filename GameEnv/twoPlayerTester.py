@@ -23,7 +23,7 @@ from env_classes.game import Game
 from env_classes.player import Player, BotPlayer
 import random as rd
 import numpy as np
-import time as tmr
+
 
 class PieceCaptureTwoStep:
 
@@ -31,7 +31,6 @@ class PieceCaptureTwoStep:
         self.p1 = Player()
         self.p2 = Player()
         self.curr_player = self.p1
-        self.action_space = np.ndarray(int(x_size * y_size))
         self.game = Game(self.p1, self.p2, x_size, y_size)
         self.game.start()
 
@@ -95,11 +94,11 @@ class PieceCaptureTwoStep:
             self.p2 = BotPlayer()
             self.game.assign_player_piece_color()
 
-    def get_action_space(self):
-        return len(self.action_space)
-    
     def reset(self):
         self.game.reset()
         return self.game.Board.Grid
+
+    def action_space(self):
+        return len(self.game.Board.Grid) * len(self.game.Board.Grid[0])
     
 
