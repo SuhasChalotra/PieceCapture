@@ -100,5 +100,14 @@ class PieceCaptureTwoStep:
 
     def action_space(self):
         return len(self.game.Board.Grid) * len(self.game.Board.Grid[0])
-    
+
+    def num_to_action(self, arg_int):
+        """
+        Returns the array index to a [row, col] tuple
+        :param arg_int: the index of an array
+        :return: a tuple [row, col] (y, x)
+        """
+        row = arg_int // self.game.Board.ROW_COUNT
+        col = arg_int % self.game.Board.ROW_COUNT
+        return tuple([row, col])
 
