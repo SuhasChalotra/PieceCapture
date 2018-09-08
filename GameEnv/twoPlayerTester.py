@@ -44,7 +44,7 @@ class PieceCaptureTwoStep:
         move_valid, p1_reward, p2_reward, done = 0, 0, 0, False
 
         if self.curr_player == self.p1:
-            move_valid, p1_reward, p2_reward = self.game.place_piece(self.p1, (x, y))
+            move_valid, p1_reward, p2_reward = self.game.place_piece(self.p1, (int(x), int(y)))
             if move_valid:
                 self.curr_player = self.p2
                 done = self.game.is_game_complete()
@@ -62,7 +62,7 @@ class PieceCaptureTwoStep:
         move_valid, p1_reward, p2_reward, done = 0, 0, 0, False
 
         if self.curr_player == self.p2:
-            move_valid, p1_reward, p2_reward = self.game.place_piece(self.p2, (x, y))
+            move_valid, p1_reward, p2_reward = self.game.place_piece(self.p2, (int(x), int(y)))
             if move_valid:
                 self.curr_player = self.p1
                 done = self.game.is_game_complete()
