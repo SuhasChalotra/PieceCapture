@@ -785,6 +785,7 @@ class Strategy:
 
         :return: the opposite piece color to the player
         """
+        print(arg_in_color)
         if arg_in_color == 1:
             return -1
         elif arg_in_color == -1:

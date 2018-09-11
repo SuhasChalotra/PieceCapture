@@ -20,7 +20,7 @@ class Game:
         :param cols: on the X-axis [rows, cols]
         """
         # Must ensure that the correct object type is passed as parameters
-       
+
         if isinstance(player_1, Player):
             self.Player1 = player_1
 
