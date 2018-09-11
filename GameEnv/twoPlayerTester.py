@@ -86,13 +86,14 @@ class PieceCaptureTwoStep:
     def print(self):
         print(self.game.Board.Grid, end='\r')
 
-    def make_player_smart(self, player_num):
-        if player_num == 1:
-            self.p1 = BotPlayer()
-            self.game.assign_player_piece_color()
-        if player_num == 2:
-            self.p2 = BotPlayer()
-            self.game.assign_player_piece_color()
+    def make_player_smart(self):
+        self.p1 = BotPlayer()
+        self.p2 = BotPlayer()
+        self.curr_player = self.p1
+        self.game.Player1 = self.p1
+        self.game.Player2 = self.p2
+        self.game.assign_player_piece_color()
+        self.game.start()
 
     def reset(self):
         self.game.reset()
